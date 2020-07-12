@@ -4,6 +4,7 @@ export default tempData = [
   {
     name: "Plan a Trip",
     color: "#24A6D9",
+    key: "no1",
     todos: [
       {
         title: "Book Flight",
@@ -26,6 +27,7 @@ export default tempData = [
   {
     name: "Errands",
     color: "#8022D9",
+    key: "no2",
     todos: [
       {
         title: "Buy Milk",
@@ -48,6 +50,7 @@ export default tempData = [
   {
     name: "Birthday Party",
     color: "#595BD9",
+    key: "no3",
     todos: [
       {
         title: "Get Balloons",

@@ -15,9 +15,23 @@ import AddListModal from "./components/AddListModal";
 
 export default App = () => {
   const [addTodoVisible, setAddTodoVisible] = useState(false);
+  const [lists, setLists] = useState(tempData);
 
   const toggleAddTodoModal = () => {
     setAddTodoVisible(!addTodoVisible);
+  };
+
+  const addList = (list) => {
+    setLists((lists) => [
+      ...lists,
+      { ...list, key: (Math.random() + Math.random()).toString(), todos: [] },
+    ]);
+  };
+
+  const updateList = (list) => {
+    setLists((lists) =>
+      lists.map((item) => (item.key === list.key ? list : item))
+    );
   };
 
   return (
@@ -27,7 +41,7 @@ export default App = () => {
         visible={addTodoVisible}
         onRequestClose={toggleAddTodoModal}
       >
-        <AddListModal closeModal={toggleAddTodoModal} />
+        <AddListModal closeModal={toggleAddTodoModal} addList={addList} />
       </Modal>
       <View style={{ flexDirection: "row" }}>
         <View style={styles.divider} />
@@ -50,11 +64,14 @@ export default App = () => {
 
       <View style={{ height: 275, paddingLeft: 32 }}>
         <FlatList
-          data={tempData}
-          keyExtractor={(item) => item.name}
+          data={lists}
+          keyExtractor={(item) => item.key}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => <TodoList list={item} />}
+          renderItem={({ item }) => (
+            <TodoList list={item} updateList={updateList} />
+          )}
+          keyboardShouldPersistTaps="always"
         />
       </View>
     </View>

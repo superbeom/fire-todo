@@ -13,9 +13,8 @@ import {
 import { AntDesign } from "@expo/vector-icons";
 import { colors, backgroundColors } from "../styles";
 import RenderColor from "./RenderColor";
-import tempData from "../tempData";
 
-export default ({ closeModal }) => {
+export default ({ closeModal, addList }) => {
   const [name, setName] = useState("");
   const [borderColor, setBorderColor] = useState(backgroundColors[0]);
   const [color, setColor] = useState(backgroundColors[0]);
@@ -24,12 +23,8 @@ export default ({ closeModal }) => {
     if (name === "") {
       Alert.alert("Write todo list name");
     } else {
-      tempData.push({
-        name,
-        color,
-        todos: [],
-      });
-
+      const list = { name, color };
+      addList(list);
       closeModal();
     }
   };
@@ -72,7 +67,7 @@ export default ({ closeModal }) => {
             onPress={createTodo}
           >
             <Text style={{ color: colors.whiteColor, fontWeight: "600" }}>
-              Creaste!
+              Create!
             </Text>
           </TouchableOpacity>
         </View>

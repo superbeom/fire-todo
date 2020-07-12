@@ -8,81 +8,88 @@ import {
   FlatList,
   KeyboardAvoidingView,
   TextInput,
+  Keyboard,
 } from "react-native";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 import { colors } from "../styles";
+import RenderTodo from "./RenderTodo";
 
-export default ({ list, closeModal }) => {
-  const [name, setName] = useState(list.name);
-  const [color, setColor] = useState(list.color);
-  const [todos, setTodos] = useState(list.todos);
-  const taskCount = todos.length;
-  const completedCount = todos.filter((todo) => todo.completed).length;
+export default ({ list, closeModal, updateList }) => {
+  const [newTodo, setNewTodo] = useState("");
+  const taskCount = list.todos.length;
+  const completedCount = list.todos.filter((todo) => todo.completed).length;
 
-  const renderTodo = (todo) => (
-    <View style={styles.todoContainer}>
-      <TouchableOpacity>
-        <Ionicons
-          name={todo.completed ? "ios-square" : "ios-square-outline"}
-          size={24}
-          color={colors.grayColor}
-          style={{ width: 32 }}
-        />
-      </TouchableOpacity>
-      <Text
-        style={[
-          styles.todo,
-          {
-            textDecorationLine: todo.completed ? "line-through" : "none",
-            color: todo.completed ? colors.grayColor : colors.blackColor,
-          },
-        ]}
-      >
-        {todo.title}
-      </Text>
-    </View>
-  );
+  const toggleTodoCompleted = (index) => {
+    list.todos[index].completed = !list.todos[index].completed;
+    updateList(list);
+  };
+
+  const addTodo = () => {
+    list.todos.push({ title: newTodo, completed: false });
+    updateList(list);
+    setNewTodo("");
+    Keyboard.dismiss();
+  };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <TouchableOpacity
-        style={{ position: "absolute", top: 64, right: 32, zIndex: 10 }}
-        onPress={closeModal}
-      >
-        <AntDesign name={"close"} size={34} color={colors.blackColor} />
-      </TouchableOpacity>
-
-      <View
-        style={[styles.section, styles.header, { borderBottomColor: color }]}
-      >
-        <View>
-          <Text style={styles.title}>{name}</Text>
-          <Text style={styles.taskCount}>
-            {completedCount} of {taskCount} tasks
-          </Text>
-        </View>
-      </View>
-
-      <View style={[styles.section, { flex: 3 }]}>
-        <FlatList
-          data={todos}
-          keyExtractor={(item) => item.title}
-          renderItem={({ item }) => renderTodo(item)}
-          contentContainerStyle={{ paddingHorizontal: 32, paddingVertical: 64 }}
-          showsVerticalScrollIndicator={false}
-        />
-      </View>
-
-      <KeyboardAvoidingView
-        style={[styles.section, styles.footer]}
-        behavior="padding"
-      >
-        <TextInput style={[styles.input, { borderColor: color }]} />
-        <TouchableOpacity style={[styles.addTodo, { backgroundColor: color }]}>
-          <AntDesign name={"plus"} size={16} color={colors.whiteColor} />
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={"padding"}>
+      <SafeAreaView style={styles.container}>
+        <TouchableOpacity
+          style={{ position: "absolute", top: 64, right: 32, zIndex: 10 }}
+          onPress={closeModal}
+        >
+          <AntDesign name={"close"} size={34} color={colors.blackColor} />
         </TouchableOpacity>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+
+        <View
+          style={[
+            styles.section,
+            styles.header,
+            { borderBottomColor: list.color },
+          ]}
+        >
+          <View>
+            <Text style={styles.title}>{list.name}</Text>
+            <Text style={styles.taskCount}>
+              {completedCount} of {taskCount} tasks
+            </Text>
+          </View>
+        </View>
+
+        <View style={[styles.section, { flex: 3 }]}>
+          <FlatList
+            data={list.todos}
+            keyExtractor={() => (Math.random() + Math.random()).toString()}
+            renderItem={({ item, index }) => (
+              <RenderTodo
+                todo={item}
+                index={index}
+                toggleTodoCompleted={toggleTodoCompleted}
+              />
+            )}
+            contentContainerStyle={{
+              paddingHorizontal: 32,
+              paddingVertical: 64,
+            }}
+            showsVerticalScrollIndicator={false}
+          />
+        </View>
+
+        <View style={[styles.section, styles.footer]}>
+          <TextInput
+            style={[styles.input, { borderColor: list.color }]}
+            onChangeText={(text) => setNewTodo(text)}
+            value={newTodo}
+          />
+          <TouchableOpacity
+            style={[styles.addTodo, { backgroundColor: list.color }]}
+            onPress={addTodo}
+          >
+            <AntDesign name={"plus"} size={16} color={colors.whiteColor} />
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -130,15 +137,5 @@ const styles = StyleSheet.create({
     padding: 16,
     justifyContent: "center",
     alignItems: "center",
-  },
-  todoContainer: {
-    paddingVertical: 16,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  todo: {
-    color: colors.blackColor,
-    fontWeight: "700",
-    fontSize: 16,
   },
 });
