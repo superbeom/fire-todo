@@ -1,27 +1,45 @@
-import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, Text, View, TouchableOpacity, Modal } from "react-native";
 import { colors } from "../styles";
+import TodoModal from "./TodoModal";
 
 export default ({ list }) => {
+  const [showListVisible, setShowListVisible] = useState(false);
   const completedCount = list.todos.filter((todo) => todo.completed).length;
   const remainingCount = list.todos.length - completedCount;
 
-  return (
-    <View style={[styles.listContainer, { backgroundColor: list.color }]}>
-      <Text style={styles.listTitle} numberOfLines={1}>
-        {list.name}
-      </Text>
+  const toggleListModal = () => {
+    setShowListVisible(!showListVisible);
+  };
 
-      <View>
-        <View style={{ alignItems: "center" }}>
-          <Text style={styles.count}>{remainingCount}</Text>
-          <Text style={styles.subtitle}>Remaining</Text>
+  return (
+    <View>
+      <Modal
+        animationType="slide"
+        visible={showListVisible}
+        onRequestClose={toggleListModal}
+      >
+        <TodoModal list={list} closeModal={toggleListModal} />
+      </Modal>
+      <TouchableOpacity
+        style={[styles.listContainer, { backgroundColor: list.color }]}
+        onPress={toggleListModal}
+      >
+        <Text style={styles.listTitle} numberOfLines={1}>
+          {list.name}
+        </Text>
+
+        <View>
+          <View style={{ alignItems: "center" }}>
+            <Text style={styles.count}>{remainingCount}</Text>
+            <Text style={styles.subtitle}>Remaining</Text>
+          </View>
+          <View style={{ alignItems: "center" }}>
+            <Text style={styles.count}>{completedCount}</Text>
+            <Text style={styles.subtitle}>Completed</Text>
+          </View>
         </View>
-        <View style={{ alignItems: "center" }}>
-          <Text style={styles.count}>{completedCount}</Text>
-          <Text style={styles.subtitle}>Completed</Text>
-        </View>
-      </View>
+      </TouchableOpacity>
     </View>
   );
 };
