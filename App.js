@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -6,42 +6,123 @@ import {
   TouchableOpacity,
   FlatList,
   Modal,
+  ActivityIndicator,
 } from "react-native";
+import AsyncStorage from "@react-native-community/async-storage";
 import { AntDesign } from "@expo/vector-icons";
 import { colors } from "./styles";
-import tempData from "./tempData";
 import TodoList from "./components/TodoList";
 import AddListModal from "./components/AddListModal";
+import { randomKeyOne } from "./key";
+
+let COUNT = 0;
 
 export default App = () => {
   const [addTodoVisible, setAddTodoVisible] = useState(false);
-  const [lists, setLists] = useState(tempData);
+  const [storageLists, setStorageLists] = useState([]);
+  const [screenLists, setScreenLists] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const toggleAddTodoModal = () => {
     setAddTodoVisible(!addTodoVisible);
   };
 
-  const addList = (list) => {
-    setLists((lists) => [
-      ...lists,
-      { ...list, key: (Math.random() + Math.random()).toString(), todos: [] },
-    ]);
+  const addList = async (screenList) => {
+    const newAddList = {
+      ...screenList,
+      key: (Math.random() + Math.random()).toString(),
+      todos: [],
+      index: COUNT,
+    };
+
+    setScreenLists((screenLists) => [...screenLists, newAddList]);
+    setStorageLists((storageLists) => [...storageLists, newAddList]);
+    // await AsyncStorage.setItem(randomKeyOne[COUNT], JSON.stringify(newAddList));
+    COUNT++;
+    // await AsyncStorage.setItem("count", COUNT.toString());
   };
 
-  const updateList = (list) => {
-    setLists((lists) =>
-      lists.map((item) => (item.key === list.key ? list : item))
+  const updateList = (screenList) => {
+    setScreenLists((screenLists) =>
+      screenLists.map(async (item) => {
+        if (item.key === screenList.key) {
+          return screenList;
+        } else {
+          return item;
+        }
+      })
+    );
+    setStorageLists((storageLists) =>
+      storageLists.map(async (item) => {
+        if (item.key === screenList.key) {
+          const updateIndex = screenList.index;
+          // await AsyncStorage.setItem(
+          //   randomKeyOne[updateIndex],
+          //   JSON.stringify(screenList)
+          // );
+          return screenList;
+        } else {
+          return item;
+        }
+      })
     );
   };
 
-  return (
+  const deleteList = async (screenList) => {
+    const newLists = screenLists.filter((item) => item.key !== screenList.key);
+    setScreenLists((screenLists) => [...newLists]);
+    setStorageLists((storageLists) => [...newLists]);
+    // await AsyncStorage.removeItem(randomKeyOne[screenList.index]);
+  };
+
+  const preLoad = async () => {
+    try {
+      // await AsyncStorage.clear();
+      const storageCount = await AsyncStorage.getItem("count");
+      if (storageCount) {
+        COUNT = parseInt(storageCount);
+        for (let i = 0; i < COUNT; i++) {
+          const getList = await AsyncStorage.getItem(randomKeyOne[i]);
+          console.log("getList: ", getList);
+          if (getList !== null) {
+            const userList = JSON.parse(getList);
+            setScreenLists((screenLists) => [...screenLists, userList]);
+          } else {
+            console.log("getList is null. This index is ", i);
+          }
+        }
+      } else {
+        await AsyncStorage.setItem("count", "0");
+      }
+
+      setLoading(false);
+    } catch (error) {
+      console.log("error: ", error);
+    }
+  };
+
+  useEffect(() => {
+    preLoad();
+  }, []);
+
+  return loading ? (
+    <ActivityIndicator
+      style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+      size={"large"}
+      color={colors.lightBlueColor}
+    />
+  ) : (
     <View style={styles.container}>
       <Modal
         animationType="slide"
         visible={addTodoVisible}
         onRequestClose={toggleAddTodoModal}
       >
-        <AddListModal closeModal={toggleAddTodoModal} addList={addList} />
+        <AddListModal
+          closeModal={toggleAddTodoModal}
+          addList={addList}
+          screenLists={screenLists}
+        />
       </Modal>
       <View style={{ flexDirection: "row" }}>
         <View style={styles.divider} />
@@ -64,12 +145,17 @@ export default App = () => {
 
       <View style={{ height: 275, paddingLeft: 32 }}>
         <FlatList
-          data={lists}
+          data={screenLists}
           keyExtractor={(item) => item.key}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
           renderItem={({ item }) => (
-            <TodoList list={item} updateList={updateList} />
+            <TodoList
+              key={item.key}
+              screenList={item}
+              updateList={updateList}
+              deleteList={deleteList}
+            />
           )}
           keyboardShouldPersistTaps="always"
         />

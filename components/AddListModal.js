@@ -14,17 +14,21 @@ import { AntDesign } from "@expo/vector-icons";
 import { colors, backgroundColors } from "../styles";
 import RenderColor from "./RenderColor";
 
-export default ({ closeModal, addList }) => {
+export default ({ closeModal, addList, screenLists }) => {
   const [name, setName] = useState("");
   const [borderColor, setBorderColor] = useState(backgroundColors[0]);
   const [color, setColor] = useState(backgroundColors[0]);
 
   const createTodo = () => {
-    if (name === "") {
+    const blankRegex = /^\s*$/;
+
+    if (blankRegex.test(name)) {
       Alert.alert("Write todo list name");
+    } else if (screenLists.filter((item) => item.name === name).length > 0) {
+      Alert.alert("Already exists");
     } else {
-      const list = { name, color };
-      addList(list);
+      const screenList = { name, color };
+      addList(screenList);
       closeModal();
     }
   };
@@ -46,6 +50,7 @@ export default ({ closeModal, addList }) => {
             style={[styles.input, { borderColor: borderColor }]}
             placeholder={"Todo List Name"}
             onChangeText={(text) => setName(text)}
+            autoCorrect={false}
           />
 
           <View

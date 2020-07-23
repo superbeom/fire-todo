@@ -8,25 +8,36 @@ import {
   FlatList,
   KeyboardAvoidingView,
   TextInput,
+  Alert,
   Keyboard,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { colors } from "../styles";
 import RenderTodo from "./RenderTodo";
 
-export default ({ list, closeModal, updateList }) => {
+export default ({ screenList, closeModal, updateList }) => {
   const [newTodo, setNewTodo] = useState("");
-  const taskCount = list.todos.length;
-  const completedCount = list.todos.filter((todo) => todo.completed).length;
+  const taskCount = screenList.todos.length;
+  const completedCount = screenList.todos.filter((todo) => todo.completed)
+    .length;
 
   const toggleTodoCompleted = (index) => {
-    list.todos[index].completed = !list.todos[index].completed;
-    updateList(list);
+    screenList.todos[index].completed = !screenList.todos[index].completed;
+    updateList(screenList);
   };
 
   const addTodo = () => {
-    list.todos.push({ title: newTodo, completed: false });
-    updateList(list);
+    const blankRegex = /^\s*$/;
+
+    if (screenList.todos.filter((todo) => todo.title === newTodo).length > 0) {
+      Alert.alert("Already exists");
+    } else if (blankRegex.test(newTodo)) {
+      Alert.alert("Write todo name");
+    } else {
+      screenList.todos.push({ title: newTodo, completed: false });
+      updateList(screenList);
+    }
+
     setNewTodo("");
     Keyboard.dismiss();
   };
@@ -45,11 +56,11 @@ export default ({ list, closeModal, updateList }) => {
           style={[
             styles.section,
             styles.header,
-            { borderBottomColor: list.color },
+            { borderBottomColor: screenList.color },
           ]}
         >
           <View>
-            <Text style={styles.title}>{list.name}</Text>
+            <Text style={styles.title}>{screenList.name}</Text>
             <Text style={styles.taskCount}>
               {completedCount} of {taskCount} tasks
             </Text>
@@ -58,10 +69,11 @@ export default ({ list, closeModal, updateList }) => {
 
         <View style={[styles.section, { flex: 3 }]}>
           <FlatList
-            data={list.todos}
+            data={screenList.todos}
             keyExtractor={() => (Math.random() + Math.random()).toString()}
             renderItem={({ item, index }) => (
               <RenderTodo
+                key={screenList.key}
                 todo={item}
                 index={index}
                 toggleTodoCompleted={toggleTodoCompleted}
@@ -77,12 +89,13 @@ export default ({ list, closeModal, updateList }) => {
 
         <View style={[styles.section, styles.footer]}>
           <TextInput
-            style={[styles.input, { borderColor: list.color }]}
+            style={[styles.input, { borderColor: screenList.color }]}
             onChangeText={(text) => setNewTodo(text)}
             value={newTodo}
+            autoCorrect={false}
           />
           <TouchableOpacity
-            style={[styles.addTodo, { backgroundColor: list.color }]}
+            style={[styles.addTodo, { backgroundColor: screenList.color }]}
             onPress={addTodo}
           >
             <AntDesign name={"plus"} size={16} color={colors.whiteColor} />
