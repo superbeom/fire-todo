@@ -19,11 +19,25 @@ let COUNT = 0;
 
 export default App = () => {
   const [addTodoVisible, setAddTodoVisible] = useState(false);
-  const [storageLists, setStorageLists] = useState([]);
   const [screenLists, setScreenLists] = useState([]);
+  const [revise, setRevise] = useState(false);
+  const [reviseScreenList, setReviseScreenList] = useState({});
+  const [reviseKey, setReviseKey] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const toggleAddTodoModal = () => {
+    setAddTodoVisible(!addTodoVisible);
+  };
+
+  const closeReviseModal = () => {
+    setRevise(false);
+    toggleAddTodoModal();
+  };
+
+  const toggleReviseListName = (screenList) => {
+    setRevise(true);
+    setReviseScreenList(screenList);
+    setReviseKey(screenList.key);
     setAddTodoVisible(!addTodoVisible);
   };
 
@@ -36,30 +50,65 @@ export default App = () => {
     };
 
     setScreenLists((screenLists) => [...screenLists, newAddList]);
-    setStorageLists((storageLists) => [...storageLists, newAddList]);
-    // await AsyncStorage.setItem(randomKeyOne[COUNT], JSON.stringify(newAddList));
+    await AsyncStorage.setItem(randomKeyOne[COUNT], JSON.stringify(newAddList));
     COUNT++;
-    // await AsyncStorage.setItem("count", COUNT.toString());
+    await AsyncStorage.setItem("count", COUNT.toString());
   };
 
-  const updateList = (screenList) => {
+  const reviseList = (screenList) => {
+    // const newReviseLists = screenLists.filter(async (item) => {
+    //   if (item.index === reviseKey) {
+    //     const newList = {
+    //       ...item,
+    //       ...screenList,
+    //     };
+
+    //     await AsyncStorage.setItem(
+    //       randomKeyOne[reviseKey],
+    //       JSON.stringify(newList)
+    //     );
+
+    //     return newList;
+    //   } else {
+    //     return item;
+    //   }
+    // });
+
+    // setScreenLists((screenLists) => [...newReviseLists]);
+    // setRevise(false);
+
     setScreenLists((screenLists) =>
-      screenLists.map(async (item) => {
-        if (item.key === screenList.key) {
-          return screenList;
+      screenLists.filter(async (item) => {
+        if (item.key === reviseKey) {
+          const newList = {
+            ...item,
+            ...screenList,
+          };
+
+          await AsyncStorage.setItem(
+            randomKeyOne[item.index],
+            JSON.stringify(newList)
+          );
+
+          return newList;
         } else {
           return item;
         }
       })
     );
-    setStorageLists((storageLists) =>
-      storageLists.map(async (item) => {
+
+    setRevise(false);
+  };
+
+  const updateList = (screenList) => {
+    setScreenLists((screenLists) =>
+      screenLists.filter(async (item) => {
         if (item.key === screenList.key) {
           const updateIndex = screenList.index;
-          // await AsyncStorage.setItem(
-          //   randomKeyOne[updateIndex],
-          //   JSON.stringify(screenList)
-          // );
+          await AsyncStorage.setItem(
+            randomKeyOne[updateIndex],
+            JSON.stringify(screenList)
+          );
           return screenList;
         } else {
           return item;
@@ -71,8 +120,7 @@ export default App = () => {
   const deleteList = async (screenList) => {
     const newLists = screenLists.filter((item) => item.key !== screenList.key);
     setScreenLists((screenLists) => [...newLists]);
-    setStorageLists((storageLists) => [...newLists]);
-    // await AsyncStorage.removeItem(randomKeyOne[screenList.index]);
+    await AsyncStorage.removeItem(randomKeyOne[screenList.index]);
   };
 
   const preLoad = async () => {
@@ -122,6 +170,10 @@ export default App = () => {
           closeModal={toggleAddTodoModal}
           addList={addList}
           screenLists={screenLists}
+          revise={revise}
+          closeReviseModal={closeReviseModal}
+          reviseList={reviseList}
+          reviseScreenList={reviseScreenList}
         />
       </Modal>
       <View style={{ flexDirection: "row" }}>
@@ -151,10 +203,10 @@ export default App = () => {
           showsHorizontalScrollIndicator={false}
           renderItem={({ item }) => (
             <TodoList
-              key={item.key}
               screenList={item}
               updateList={updateList}
               deleteList={deleteList}
+              toggleReviseListName={toggleReviseListName}
             />
           )}
           keyboardShouldPersistTaps="always"

@@ -34,7 +34,11 @@ export default ({ screenList, closeModal, updateList }) => {
     } else if (blankRegex.test(newTodo)) {
       Alert.alert("Write todo name");
     } else {
-      screenList.todos.push({ title: newTodo, completed: false });
+      screenList.todos.push({
+        title: newTodo,
+        completed: false,
+      });
+      console.log("TodoModal and screenList: ", screenList);
       updateList(screenList);
     }
 
@@ -73,7 +77,6 @@ export default ({ screenList, closeModal, updateList }) => {
             keyExtractor={() => (Math.random() + Math.random()).toString()}
             renderItem={({ item, index }) => (
               <RenderTodo
-                key={screenList.key}
                 todo={item}
                 index={index}
                 toggleTodoCompleted={toggleTodoCompleted}

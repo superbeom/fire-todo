@@ -10,7 +10,12 @@ import {
 import { colors } from "../styles";
 import TodoModal from "./TodoModal";
 
-export default ({ screenList, updateList, deleteList }) => {
+export default ({
+  screenList,
+  updateList,
+  deleteList,
+  toggleReviseListName,
+}) => {
   const [showListVisible, setShowListVisible] = useState(false);
   const completedCount = screenList.todos.filter((todo) => todo.completed)
     .length;
@@ -40,12 +45,19 @@ export default ({ screenList, updateList, deleteList }) => {
         ]}
         onPress={toggleListModal}
         onLongPress={() => {
-          Alert.alert("Want to delete this todo list?", "", [
+          Alert.alert("What do you want to do?", "", [
             {
               text: "Cancel",
               onPress: () => null,
             },
-            { text: "Yes", onPress: deleteList.bind(this, screenList) },
+            {
+              text: "Revise list",
+              onPress: toggleReviseListName.bind(this, screenList),
+            },
+            {
+              text: "Delete list",
+              onPress: deleteList.bind(this, screenList),
+            },
           ]);
         }}
       >

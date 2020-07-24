@@ -14,10 +14,22 @@ import { AntDesign } from "@expo/vector-icons";
 import { colors, backgroundColors } from "../styles";
 import RenderColor from "./RenderColor";
 
-export default ({ closeModal, addList, screenLists }) => {
-  const [name, setName] = useState("");
-  const [borderColor, setBorderColor] = useState(backgroundColors[0]);
-  const [color, setColor] = useState(backgroundColors[0]);
+export default ({
+  closeModal,
+  addList,
+  screenLists,
+  revise,
+  closeReviseModal,
+  reviseList,
+  reviseScreenList,
+}) => {
+  const [name, setName] = useState(revise ? reviseScreenList.name : "");
+  const [borderColor, setBorderColor] = useState(
+    revise ? reviseScreenList.color : backgroundColors[0]
+  );
+  const [color, setColor] = useState(
+    revise ? reviseScreenList.color : backgroundColors[0]
+  );
 
   const createTodo = () => {
     const blankRegex = /^\s*$/;
@@ -33,23 +45,44 @@ export default ({ closeModal, addList, screenLists }) => {
     }
   };
 
+  const reviseTodo = () => {
+    const blankRegex = /^\s*$/;
+
+    if (blankRegex.test(name)) {
+      Alert.alert("Write todo list name");
+    } else if (
+      screenLists.filter(
+        (item) => item.name === name && item.name !== reviseScreenList.name
+      ).length > 0
+    ) {
+      Alert.alert("Already exists");
+    } else {
+      const screenList = { name, color };
+      reviseList(screenList);
+      closeModal();
+    }
+  };
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView style={styles.container} behavior={"padding"}>
         <TouchableOpacity
           style={{ position: "absolute", top: 64, right: 32 }}
-          onPress={closeModal}
+          onPress={revise ? closeReviseModal : closeModal}
         >
           <AntDesign name={"close"} size={34} color={colors.blackColor} />
         </TouchableOpacity>
 
         <View style={{ alignSelf: "stretch", marginHorizontal: 32 }}>
-          <Text style={styles.title}>Create Todo List</Text>
+          <Text style={styles.title}>
+            {revise ? "Revise Todo List" : "Create Todo List"}
+          </Text>
 
           <TextInput
             style={[styles.input, { borderColor: borderColor }]}
             placeholder={"Todo List Name"}
             onChangeText={(text) => setName(text)}
+            value={name}
             autoCorrect={false}
           />
 
@@ -69,10 +102,10 @@ export default ({ closeModal, addList, screenLists }) => {
 
           <TouchableOpacity
             style={[styles.create, { backgroundColor: color }]}
-            onPress={createTodo}
+            onPress={revise ? reviseTodo : createTodo}
           >
             <Text style={{ color: colors.whiteColor, fontWeight: "600" }}>
-              Create!
+              {revise ? "Revise!" : "Create!"}
             </Text>
           </TouchableOpacity>
         </View>
