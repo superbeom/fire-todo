@@ -38,7 +38,6 @@ export default ({ screenList, closeModal, updateList }) => {
         title: newTodo,
         completed: false,
       });
-      console.log("TodoModal and screenList: ", screenList);
       updateList(screenList);
     }
 
@@ -97,7 +96,9 @@ export default ({ screenList, closeModal, updateList }) => {
             style={[styles.input, { borderColor: screenList.color }]}
             onChangeText={(text) => setNewTodo(text)}
             value={newTodo}
+            onSubmitEditing={addTodo}
             autoCorrect={false}
+            returnKeyType={"done"}
           />
           <TouchableOpacity
             style={[styles.addTodo, { backgroundColor: screenList.color }]}

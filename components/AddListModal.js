@@ -83,7 +83,9 @@ export default ({
             placeholder={"Todo List Name"}
             onChangeText={(text) => setName(text)}
             value={name}
+            onSubmitEditing={revise ? reviseTodo : createTodo}
             autoCorrect={false}
+            returnKeyType={"done"}
           />
 
           <View

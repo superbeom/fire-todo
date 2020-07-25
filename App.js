@@ -56,47 +56,32 @@ export default App = () => {
     await AsyncStorage.setItem("count", COUNT.toString());
   };
 
-  const reviseList = (screenList) => {
-    // const newReviseLists = screenLists.filter(async (item) => {
-    //   if (item.key === reviseKey) {
-    //     const newList = {
-    //       ...item,
-    //       ...screenList,
-    //     };
+  const reviseList = async (screenList) => {
+    let tempList = [];
+    let tempIndex = null;
+    let tempNewList = {};
 
-    //     await AsyncStorage.setItem(
-    //       randomKeyOne[item.index],
-    //       JSON.stringify(newList)
-    //     );
+    screenLists.forEach((item) => {
+      if (item.key === reviseKey) {
+        const newList = {
+          ...item,
+          ...screenList,
+        };
 
-    //     // return newList;
-    //   } else {
-    //     // return item;
-    //   }
-    // });
-    // console.log("newReviseLists: ", newReviseLists);
-    // setScreenLists((screenLists) => [...newReviseLists]);
+        tempIndex = item.index;
+        tempNewList = newList;
+        tempList.push(newList);
+      } else {
+        tempList.push(item);
+      }
+    });
 
-    setScreenLists((screenLists) =>
-      screenLists.filter(async (item) => {
-        if (item.key === reviseKey) {
-          const newList = {
-            ...item,
-            ...screenList,
-          };
-
-          await AsyncStorage.setItem(
-            randomKeyOne[item.index],
-            JSON.stringify(newList)
-          );
-
-          return newList;
-        } else {
-          return item;
-        }
-      })
+    await AsyncStorage.setItem(
+      randomKeyOne[tempIndex],
+      JSON.stringify(tempNewList)
     );
 
+    setScreenLists((screenLists) => [...tempList]);
     setRevise(false);
   };
 
@@ -104,9 +89,9 @@ export default App = () => {
     setScreenLists((screenLists) =>
       screenLists.filter(async (item) => {
         if (item.key === screenList.key) {
-          const updateIndex = screenList.index;
+          const newIndex = screenList.index;
           await AsyncStorage.setItem(
-            randomKeyOne[updateIndex],
+            randomKeyOne[newIndex],
             JSON.stringify(screenList)
           );
           // return screenList;
@@ -135,8 +120,6 @@ export default App = () => {
       JSON.stringify(newUpdateList)
     );
 
-    console.log("updateIndex - newUpdateList: ", newUpdateList);
-
     return newUpdateList;
   };
 
@@ -149,7 +132,6 @@ export default App = () => {
 
         for (let i = 0; i < COUNT; i++) {
           const getList = await AsyncStorage.getItem(randomKeyOne[i]);
-          console.log("getList: ", getList);
           if (getList !== null) {
             const userList = JSON.parse(getList);
             const updateUserList = await updateIndex(userList, i);
