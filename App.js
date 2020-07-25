@@ -16,6 +16,7 @@ import AddListModal from "./components/AddListModal";
 import { randomKeyOne } from "./key";
 
 let COUNT = 0;
+let CHECK_INDEX = 0;
 
 export default App = () => {
   const [addTodoVisible, setAddTodoVisible] = useState(false);
@@ -57,25 +58,24 @@ export default App = () => {
 
   const reviseList = (screenList) => {
     // const newReviseLists = screenLists.filter(async (item) => {
-    //   if (item.index === reviseKey) {
+    //   if (item.key === reviseKey) {
     //     const newList = {
     //       ...item,
     //       ...screenList,
     //     };
 
     //     await AsyncStorage.setItem(
-    //       randomKeyOne[reviseKey],
+    //       randomKeyOne[item.index],
     //       JSON.stringify(newList)
     //     );
 
-    //     return newList;
+    //     // return newList;
     //   } else {
-    //     return item;
+    //     // return item;
     //   }
     // });
-
+    // console.log("newReviseLists: ", newReviseLists);
     // setScreenLists((screenLists) => [...newReviseLists]);
-    // setRevise(false);
 
     setScreenLists((screenLists) =>
       screenLists.filter(async (item) => {
@@ -109,9 +109,9 @@ export default App = () => {
             randomKeyOne[updateIndex],
             JSON.stringify(screenList)
           );
-          return screenList;
+          // return screenList;
         } else {
-          return item;
+          // return item;
         }
       })
     );
@@ -123,22 +123,45 @@ export default App = () => {
     await AsyncStorage.removeItem(randomKeyOne[screenList.index]);
   };
 
+  const updateIndex = async (userList, index) => {
+    const newIndex = index - CHECK_INDEX;
+    const newUpdateList = {
+      ...userList,
+      index: newIndex,
+    };
+    await AsyncStorage.removeItem(randomKeyOne[index]);
+    await AsyncStorage.setItem(
+      randomKeyOne[newIndex],
+      JSON.stringify(newUpdateList)
+    );
+
+    console.log("updateIndex - newUpdateList: ", newUpdateList);
+
+    return newUpdateList;
+  };
+
   const preLoad = async () => {
     try {
       // await AsyncStorage.clear();
       const storageCount = await AsyncStorage.getItem("count");
       if (storageCount) {
         COUNT = parseInt(storageCount);
+
         for (let i = 0; i < COUNT; i++) {
           const getList = await AsyncStorage.getItem(randomKeyOne[i]);
           console.log("getList: ", getList);
           if (getList !== null) {
             const userList = JSON.parse(getList);
-            setScreenLists((screenLists) => [...screenLists, userList]);
+            const updateUserList = await updateIndex(userList, i);
+            setScreenLists((screenLists) => [...screenLists, updateUserList]);
           } else {
-            console.log("getList is null. This index is ", i);
+            CHECK_INDEX++;
+            await AsyncStorage.removeItem(randomKeyOne[i]);
           }
         }
+
+        COUNT = COUNT - CHECK_INDEX;
+        await AsyncStorage.setItem("count", COUNT.toString());
       } else {
         await AsyncStorage.setItem("count", "0");
       }

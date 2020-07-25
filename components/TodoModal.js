@@ -64,7 +64,9 @@ export default ({ screenList, closeModal, updateList }) => {
           ]}
         >
           <View>
-            <Text style={styles.title}>{screenList.name}</Text>
+            <Text style={styles.title} numberOfLines={2}>
+              {screenList.name}
+            </Text>
             <Text style={styles.taskCount}>
               {completedCount} of {taskCount} tasks
             </Text>
