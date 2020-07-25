@@ -35,7 +35,7 @@ export default App = () => {
     toggleAddTodoModal();
   };
 
-  const toggleReviseListName = (screenList) => {
+  const toggleReviseList = (screenList) => {
     setRevise(true);
     setReviseScreenList(screenList);
     setReviseKey(screenList.key);
@@ -211,7 +211,7 @@ export default App = () => {
               screenList={item}
               updateList={updateList}
               deleteList={deleteList}
-              toggleReviseListName={toggleReviseListName}
+              toggleReviseList={toggleReviseList}
             />
           )}
           keyboardShouldPersistTaps="always"
