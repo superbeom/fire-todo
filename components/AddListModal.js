@@ -13,6 +13,15 @@ import {
 import { AntDesign } from "@expo/vector-icons";
 import { colors, backgroundColors } from "../styles";
 import RenderColor from "./RenderColor";
+import {
+  CREATE,
+  EDIT,
+  ALERT_BLANK_LIST,
+  ALERT_ALREADY_EXISTS,
+  CREATE_TODO_LIST,
+  EDIT_TODO_LIST,
+  TODO_LIST_NAME,
+} from "../words";
 
 export default ({
   closeModal,
@@ -35,9 +44,9 @@ export default ({
     const blankRegex = /^\s*$/;
 
     if (blankRegex.test(name)) {
-      Alert.alert("Write todo list name");
+      Alert.alert(ALERT_BLANK_LIST);
     } else if (screenLists.filter((item) => item.name === name).length > 0) {
-      Alert.alert("Already exists");
+      Alert.alert(ALERT_ALREADY_EXISTS);
     } else {
       const screenList = { name, color };
       addList(screenList);
@@ -49,13 +58,13 @@ export default ({
     const blankRegex = /^\s*$/;
 
     if (blankRegex.test(name)) {
-      Alert.alert("Write todo list name");
+      Alert.alert(ALERT_BLANK_LIST);
     } else if (
       screenLists.filter(
         (item) => item.name === name && item.name !== reviseScreenList.name
       ).length > 0
     ) {
-      Alert.alert("Already exists");
+      Alert.alert(ALERT_ALREADY_EXISTS);
     } else {
       const screenList = { name, color };
       reviseList(screenList);
@@ -75,12 +84,12 @@ export default ({
 
         <View style={{ alignSelf: "stretch", marginHorizontal: 32 }}>
           <Text style={styles.title}>
-            {revise ? "Revise Todo List" : "Create Todo List"}
+            {revise ? EDIT_TODO_LIST : CREATE_TODO_LIST}
           </Text>
 
           <TextInput
             style={[styles.input, { borderColor: borderColor }]}
-            placeholder={"Todo List Name"}
+            placeholder={TODO_LIST_NAME}
             onChangeText={(text) => setName(text)}
             value={name}
             onSubmitEditing={revise ? reviseTodo : createTodo}
@@ -107,7 +116,7 @@ export default ({
             onPress={revise ? reviseTodo : createTodo}
           >
             <Text style={{ color: colors.whiteColor, fontWeight: "600" }}>
-              {revise ? "Revise!" : "Create!"}
+              {revise ? EDIT : CREATE}
             </Text>
           </TouchableOpacity>
         </View>

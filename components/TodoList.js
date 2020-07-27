@@ -9,6 +9,14 @@ import {
 } from "react-native";
 import { colors } from "../styles";
 import TodoModal from "./TodoModal";
+import {
+  SERIOUSLY_DELETE_LIST,
+  DELETE,
+  CANCEL,
+  EDIT_LIST,
+  DELETE_LIST,
+  WHAT_WANT,
+} from "../words";
 
 export default ({ screenList, updateList, deleteList, toggleReviseList }) => {
   const [showListVisible, setShowListVisible] = useState(false);
@@ -21,13 +29,13 @@ export default ({ screenList, updateList, deleteList, toggleReviseList }) => {
   };
 
   const DeleteLongPress = (screenList) => {
-    Alert.alert("Seriously delete list?", "", [
+    Alert.alert(SERIOUSLY_DELETE_LIST, "", [
       {
-        text: "Cancel",
+        text: CANCEL,
         onPress: () => null,
       },
       {
-        text: "Delete",
+        text: DELETE,
         onPress: deleteList.bind(this, screenList),
       },
     ]);
@@ -53,17 +61,17 @@ export default ({ screenList, updateList, deleteList, toggleReviseList }) => {
         ]}
         onPress={toggleListModal}
         onLongPress={() => {
-          Alert.alert("What do you want to do?", "", [
+          Alert.alert(WHAT_WANT, "", [
             {
-              text: "Cancel",
+              text: CANCEL,
               onPress: () => null,
             },
             {
-              text: "Revise list",
+              text: EDIT_LIST,
               onPress: toggleReviseList.bind(this, screenList),
             },
             {
-              text: "Delete list",
+              text: DELETE_LIST,
               onPress: DeleteLongPress.bind(this, screenList),
             },
           ]);

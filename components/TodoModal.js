@@ -14,6 +14,7 @@ import {
 import { AntDesign } from "@expo/vector-icons";
 import { colors } from "../styles";
 import RenderTodo from "./RenderTodo";
+import { ALERT_ALREADY_EXISTS, ALERT_BLANK_TODO } from "../words";
 
 export default ({ screenList, closeModal, updateList }) => {
   const [newTodo, setNewTodo] = useState("");
@@ -33,9 +34,9 @@ export default ({ screenList, closeModal, updateList }) => {
     const blankRegex = /^\s*$/;
 
     if (screenList.todos.filter((todo) => todo.title === newTodo).length > 0) {
-      Alert.alert("Already exists");
+      Alert.alert(ALERT_ALREADY_EXISTS);
     } else if (blankRegex.test(newTodo)) {
-      Alert.alert("Write todo name");
+      Alert.alert(ALERT_BLANK_TODO);
     } else {
       screenList.todos.push({
         title: newTodo,
@@ -63,9 +64,9 @@ export default ({ screenList, closeModal, updateList }) => {
         (todo) => todo.title === newTodo && todo.title !== editTitle
       ).length > 0
     ) {
-      Alert.alert("Already exists");
+      Alert.alert(ALERT_ALREADY_EXISTS);
     } else if (blankRegex.test(newTodo)) {
-      Alert.alert("Write todo name");
+      Alert.alert(ALERT_BLANK_TODO);
     } else {
       screenList.todos[editIndex] = {
         ...screenList.todos[editIndex],
