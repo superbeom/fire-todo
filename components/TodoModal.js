@@ -11,12 +11,15 @@ import {
   Alert,
   Keyboard,
 } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import { colors } from "../styles";
 import RenderTodo from "./RenderTodo";
 
 export default ({ screenList, closeModal, updateList }) => {
   const [newTodo, setNewTodo] = useState("");
+  const [update, setUpdate] = useState(false);
+  const [updateTitle, setUpdateTitle] = useState(null);
+  const [updateIndex, setUpdateIndex] = useState(null);
   const taskCount = screenList.todos.length;
   const completedCount = screenList.todos.filter((todo) => todo.completed)
     .length;
@@ -45,7 +48,36 @@ export default ({ screenList, closeModal, updateList }) => {
     Keyboard.dismiss();
   };
 
-  const updateTodo = () => {};
+  const editTodo = (title, index) => {
+    setUpdate(true);
+    setNewTodo(title);
+    setUpdateTitle(title);
+    setUpdateIndex(index);
+  };
+
+  const submitEditTodo = () => {
+    const blankRegex = /^\s*$/;
+
+    if (
+      screenList.todos.filter(
+        (todo) => todo.title === newTodo && todo.title !== updateTitle
+      ).length > 0
+    ) {
+      Alert.alert("Already exists");
+    } else if (blankRegex.test(newTodo)) {
+      Alert.alert("Write todo name");
+    } else {
+      screenList.todos[updateIndex] = {
+        ...screenList.todos[updateIndex],
+        title: newTodo,
+      };
+      updateList(screenList);
+    }
+
+    setNewTodo("");
+    setUpdate(false);
+    Keyboard.dismiss();
+  };
 
   const deleteTodo = (title) => {
     screenList.todos = screenList.todos.filter((todo) => todo.title !== title);
@@ -88,7 +120,11 @@ export default ({ screenList, closeModal, updateList }) => {
                 todo={item}
                 index={index}
                 toggleTodoCompleted={toggleTodoCompleted}
+                editTodo={editTodo}
                 deleteTodo={deleteTodo}
+                update={update}
+                newTodo={newTodo}
+                updateIndex={updateIndex}
               />
             )}
             contentContainerStyle={{
@@ -104,13 +140,13 @@ export default ({ screenList, closeModal, updateList }) => {
             style={[styles.input, { borderColor: screenList.color }]}
             onChangeText={(text) => setNewTodo(text)}
             value={newTodo}
-            onSubmitEditing={addTodo}
+            onSubmitEditing={update ? submitEditTodo : addTodo}
             autoCorrect={false}
             returnKeyType={"done"}
           />
           <TouchableOpacity
             style={[styles.addTodo, { backgroundColor: screenList.color }]}
-            onPress={addTodo}
+            onPress={update ? submitEditTodo : addTodo}
           >
             <AntDesign name={"plus"} size={16} color={colors.whiteColor} />
           </TouchableOpacity>

@@ -8,10 +8,23 @@ import {
 } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import Swipeable from "react-native-gesture-handler/Swipeable";
-import { Ionicons, FontAwesome } from "@expo/vector-icons";
+import {
+  FontAwesome,
+  MaterialIcons,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import { colors } from "../styles";
 
-export default ({ todo, index, toggleTodoCompleted, deleteTodo }) => {
+export default ({
+  todo,
+  index,
+  toggleTodoCompleted,
+  editTodo,
+  deleteTodo,
+  update,
+  newTodo,
+  updateIndex,
+}) => {
   const renderLeftActions = (progress, dragX) => {
     const trans = dragX.interpolate({
       inputRange: [0, 50, 100, 101],
@@ -27,7 +40,12 @@ export default ({ todo, index, toggleTodoCompleted, deleteTodo }) => {
             },
           ]}
         >
-          Revise
+          <MaterialIcons
+            name={"edit"}
+            size={30}
+            color={colors.whiteColor}
+            style={{ width: 32 }}
+          />
         </Animated.Text>
       </RectButton>
     );
@@ -56,19 +74,24 @@ export default ({ todo, index, toggleTodoCompleted, deleteTodo }) => {
 
   return (
     <Swipeable
-      // renderLeftActions={renderLeftActions}
+      renderLeftActions={renderLeftActions}
       renderRightActions={renderRightActions}
-      onSwipeableOpen={deleteTodo.bind(this, todo.title)}
+      onSwipeableLeftOpen={editTodo.bind(this, todo.title, index)}
+      onSwipeableRightOpen={deleteTodo.bind(this, todo.title)}
     >
       <View style={styles.todoContainer}>
         <TouchableOpacity
-          style={{ flexDirection: "row" }}
+          style={{ flexDirection: "row", width: "100%" }}
           onPress={toggleTodoCompleted.bind(this, index)}
         >
-          <Ionicons
-            name={todo.completed ? "ios-square" : "ios-square-outline"}
+          <MaterialCommunityIcons
+            name={
+              todo.completed
+                ? "checkbox-marked-outline"
+                : "checkbox-blank-outline"
+            }
             size={24}
-            color={colors.grayColor}
+            color={todo.completed ? colors.grayColor : colors.blackColor}
             style={{ width: 32 }}
           />
           <Text
@@ -80,7 +103,7 @@ export default ({ todo, index, toggleTodoCompleted, deleteTodo }) => {
               },
             ]}
           >
-            {todo.title}
+            {update && index === updateIndex ? newTodo : todo.title}
           </Text>
         </TouchableOpacity>
       </View>
