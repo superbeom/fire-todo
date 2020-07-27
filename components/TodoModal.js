@@ -45,6 +45,13 @@ export default ({ screenList, closeModal, updateList }) => {
     Keyboard.dismiss();
   };
 
+  const updateTodo = () => {};
+
+  const deleteTodo = (title) => {
+    screenList.todos = screenList.todos.filter((todo) => todo.title !== title);
+    updateList(screenList);
+  };
+
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={"padding"}>
       <SafeAreaView style={styles.container}>
@@ -81,6 +88,7 @@ export default ({ screenList, closeModal, updateList }) => {
                 todo={item}
                 index={index}
                 toggleTodoCompleted={toggleTodoCompleted}
+                deleteTodo={deleteTodo}
               />
             )}
             contentContainerStyle={{

@@ -8,10 +8,10 @@ import {
 } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import Swipeable from "react-native-gesture-handler/Swipeable";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import { colors } from "../styles";
 
-export default ({ todo, index, toggleTodoCompleted }) => {
+export default ({ todo, index, toggleTodoCompleted, deleteTodo }) => {
   const renderLeftActions = (progress, dragX) => {
     const trans = dragX.interpolate({
       inputRange: [0, 50, 100, 101],
@@ -39,9 +39,16 @@ export default ({ todo, index, toggleTodoCompleted }) => {
       outputRange: [300, 0],
     });
     return (
-      <RectButton style={[styles.rightAction, { backgroundColor: "red" }]}>
+      <RectButton style={styles.rightAction}>
         <Animated.View style={{ flex: 1, transform: [{ translateX: trans }] }}>
-          <Animated.Text style={styles.actionText}>Delete</Animated.Text>
+          <Animated.Text style={styles.actionText}>
+            <FontAwesome
+              name={"trash"}
+              size={30}
+              color={colors.whiteColor}
+              style={{ width: 32 }}
+            />
+          </Animated.Text>
         </Animated.View>
       </RectButton>
     );
@@ -49,8 +56,9 @@ export default ({ todo, index, toggleTodoCompleted }) => {
 
   return (
     <Swipeable
-      renderLeftActions={renderLeftActions}
+      // renderLeftActions={renderLeftActions}
       renderRightActions={renderRightActions}
+      onSwipeableOpen={deleteTodo.bind(this, todo.title)}
     >
       <View style={styles.todoContainer}>
         <TouchableOpacity
