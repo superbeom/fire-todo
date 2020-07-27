@@ -21,9 +21,9 @@ export default ({
   toggleTodoCompleted,
   editTodo,
   deleteTodo,
-  update,
+  edit,
   newTodo,
-  updateIndex,
+  editIndex,
 }) => {
   const renderLeftActions = (progress, dragX) => {
     const trans = dragX.interpolate({
@@ -31,7 +31,7 @@ export default ({
       outputRange: [-20, 0, 0, 1],
     });
     return (
-      <RectButton style={styles.leftAction} onPress={this.close}>
+      <RectButton style={styles.leftAction}>
         <Animated.Text
           style={[
             styles.actionText,
@@ -81,7 +81,7 @@ export default ({
     >
       <View style={styles.todoContainer}>
         <TouchableOpacity
-          style={{ flexDirection: "row", width: "100%" }}
+          style={{ flexDirection: "row" }}
           onPress={toggleTodoCompleted.bind(this, index)}
         >
           <MaterialCommunityIcons
@@ -103,7 +103,7 @@ export default ({
               },
             ]}
           >
-            {update && index === updateIndex ? newTodo : todo.title}
+            {edit && index === editIndex ? newTodo : todo.title}
           </Text>
         </TouchableOpacity>
       </View>
