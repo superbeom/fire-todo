@@ -74,7 +74,7 @@ export default ({
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView style={styles.container} behavior={"padding"}>
+      <KeyboardAvoidingView style={styles.container} behavior={"height"}>
         <TouchableOpacity
           style={{ position: "absolute", top: 64, right: 32 }}
           onPress={revise ? closeReviseModal : closeModal}

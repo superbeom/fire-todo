@@ -86,7 +86,7 @@ export default ({ screenList, closeModal, updateList }) => {
   };
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={"padding"}>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={"height"}>
       <SafeAreaView style={styles.container}>
         <TouchableOpacity
           style={{ position: "absolute", top: 64, right: 32, zIndex: 10 }}
