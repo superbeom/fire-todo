@@ -58,14 +58,7 @@ export default ({
     });
     return (
       <RectButton style={styles.rightAction}>
-        <Animated.View
-          style={{
-            flex: 1,
-            transform: [{ translateX: trans }],
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
+        <Animated.View style={{ flex: 1, transform: [{ translateX: trans }] }}>
           <Animated.Text style={styles.actionText}>
             <FontAwesome
               name={"trash"}
