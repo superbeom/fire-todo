@@ -7,6 +7,7 @@ import {
   FlatList,
   Modal,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import AsyncStorage from "@react-native-community/async-storage";
 import { AntDesign } from "@expo/vector-icons";
@@ -14,25 +15,78 @@ import { colors } from "./styles";
 import TodoList from "./components/TodoList";
 import AddListModal from "./components/AddListModal";
 import { randomKeyOne } from "./key";
+import moment from "moment";
 
 let COUNT = 0;
 let CHECK_INDEX = 0;
 
 export default App = () => {
+  const newDate = new Date();
   const [addTodoVisible, setAddTodoVisible] = useState(false);
   const [screenLists, setScreenLists] = useState([]);
   const [revise, setRevise] = useState(false);
   const [reviseScreenList, setReviseScreenList] = useState({});
   const [reviseKey, setReviseKey] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [now, setNow] = useState(newDate);
+  const [selectDate, setSelectDate] = useState(newDate);
+  const [goalYear, setGoalYear] = useState(null);
+  const [goalMonth, setGoalMonth] = useState(null);
+  const [goalDate, setGoalDate] = useState(null);
+  const [getTime, setGetTime] = useState(null);
+  const [show, setShow] = useState(false);
+
+  const sortScreenLists = () => {
+    const test = screenLists.sort((a, b) => {
+      if (a.getTime > b.getTime) 1;
+      if (a.getTime < b.getTime) -1;
+      return 0;
+    });
+    // console.log("test: ", test);
+    // screenLists.map((screenList) => console.log("screenLists: ", screenLists));
+  };
+
+  const setYearMonthDate = (time, detector) => {
+    const originDate = moment(time).format();
+    const splitDate = originDate.split("-");
+
+    setGoalYear(parseInt(splitDate[0]));
+    setGoalMonth(parseInt(splitDate[1]));
+    setGoalDate(parseInt(splitDate[2].substring(0, 2)));
+    setSelectDate(originDate);
+
+    if (detector === "change") {
+      setGetTime(new Date(originDate).getTime());
+    }
+  };
+
+  const nowOnChange = (event, selectedDate) => {
+    const currentDate = selectedDate || now;
+    setYearMonthDate(currentDate, "change");
+
+    if (Platform.OS === "ios") {
+      setNow(currentDate);
+    } else if (Platform.OS === "android") {
+      if (event.type === "set") {
+        setNow(currentDate);
+        setShow(false);
+      } else if (event.type === "dismissed") {
+        setShow(false);
+      }
+    }
+  };
 
   const toggleAddTodoModal = () => {
     setAddTodoVisible(!addTodoVisible);
+    setNow(newDate);
+    setYearMonthDate(newDate, "initialize");
   };
 
   const closeReviseModal = () => {
     setRevise(false);
     toggleAddTodoModal();
+    setNow(newDate);
+    setYearMonthDate(newDate, "initialize");
   };
 
   const toggleReviseList = (screenList) => {
@@ -48,12 +102,18 @@ export default App = () => {
       key: (Math.random() + Math.random()).toString(),
       todos: [],
       index: COUNT,
+      year: goalYear,
+      month: goalMonth,
+      date: goalDate,
+      getTime: getTime,
     };
 
     setScreenLists((screenLists) => [...screenLists, newAddList]);
     await AsyncStorage.setItem(randomKeyOne[COUNT], JSON.stringify(newAddList));
     COUNT++;
     await AsyncStorage.setItem("count", COUNT.toString());
+    setNow(newDate);
+    setYearMonthDate(newDate, "initialize");
   };
 
   const reviseList = async (screenList) => {
@@ -83,6 +143,7 @@ export default App = () => {
 
     setScreenLists((screenLists) => [...tempList]);
     setRevise(false);
+    setNow(new Date());
   };
 
   const updateList = (screenList) => {
@@ -148,6 +209,12 @@ export default App = () => {
         await AsyncStorage.setItem("count", "0");
       }
 
+      screenLists.forEach((screenList) =>
+        console.log("screenLists: ", screenLists)
+      );
+      // sortScreenLists();
+
+      setYearMonthDate(now, "initialize");
       setLoading(false);
     } catch (error) {
       console.log("error: ", error);
@@ -179,28 +246,26 @@ export default App = () => {
           closeReviseModal={closeReviseModal}
           reviseList={reviseList}
           reviseScreenList={reviseScreenList}
+          nowOnChange={nowOnChange}
+          now={now}
+          show={show}
+          setShow={setShow}
+          selectDate={selectDate}
         />
       </Modal>
       <View style={{ flexDirection: "row" }}>
-        <View style={styles.divider} />
-        <Text style={styles.title}>
-          Todo{" "}
-          <Text style={{ fontWeight: "300", color: colors.blueColor }}>
-            Lists
-          </Text>
-        </Text>
-        <View style={styles.divider} />
+        <Text style={styles.title}>Todo Secretary</Text>
       </View>
 
       <View style={{ marginVertical: 48 }}>
         <TouchableOpacity style={styles.addList} onPress={toggleAddTodoModal}>
-          <AntDesign name={"plus"} size={16} color={colors.blueColor} />
+          <AntDesign name={"plus"} size={16} color={colors.blackColor} />
         </TouchableOpacity>
 
         <Text style={styles.add}>Add List</Text>
       </View>
 
-      <View style={{ height: 275, paddingLeft: 32 }}>
+      <View style={{ height: 375, paddingLeft: 32 }}>
         <FlatList
           data={screenLists}
           keyExtractor={(item) => item.key}
@@ -242,14 +307,14 @@ const styles = StyleSheet.create({
   },
   addList: {
     borderWidth: 2,
-    borderColor: colors.lightBlueColor,
+    borderColor: colors.blackColor,
     borderRadius: 4,
     padding: 16,
     justifyContent: "center",
     alignItems: "center",
   },
   add: {
-    color: colors.blueColor,
+    color: colors.blackColor,
     fontWeight: "600",
     fontSize: 14,
     marginTop: 8,

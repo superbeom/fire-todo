@@ -16,14 +16,11 @@ import { colors } from "../styles";
 import RenderTodo from "./RenderTodo";
 import { ALERT_ALREADY_EXISTS, ALERT_BLANK_TODO } from "../words";
 
-export default ({ screenList, closeModal, updateList }) => {
+export default ({ screenList, closeModal, updateList, remainingDay }) => {
   const [newTodo, setNewTodo] = useState("");
   const [edit, setEdit] = useState(false);
   const [editTitle, setEditTitle] = useState(null);
   const [editIndex, setEditIndex] = useState(null);
-  const taskCount = screenList.todos.length;
-  const completedCount = screenList.todos.filter((todo) => todo.completed)
-    .length;
 
   const toggleTodoCompleted = (index) => {
     screenList.todos[index].completed = !screenList.todos[index].completed;
@@ -106,8 +103,12 @@ export default ({ screenList, closeModal, updateList }) => {
             <Text style={styles.title} numberOfLines={2}>
               {screenList.name}
             </Text>
-            <Text style={styles.taskCount}>
-              {completedCount} of {taskCount} tasks
+            <Text style={styles.remainingCount}>
+              {remainingDay() === 0
+                ? `D-Day!!`
+                : remainingDay() > 0
+                ? `D-${remainingDay()}`
+                : `D+${Math.abs(remainingDay())}`}
             </Text>
           </View>
         </View>
@@ -177,7 +178,8 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     color: colors.blackColor,
   },
-  taskCount: {
+  remainingCount: {
+    fontSize: 20,
     marginTop: 4,
     marginBottom: 16,
     color: colors.grayColor,

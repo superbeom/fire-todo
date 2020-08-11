@@ -7,7 +7,11 @@ import {
   Modal,
   Alert,
 } from "react-native";
-import { colors } from "../styles";
+import {
+  colors,
+  backgroundColors,
+  backgroundTransparentColors,
+} from "../styles";
 import TodoModal from "./TodoModal";
 import {
   SERIOUSLY_DELETE_LIST,
@@ -17,12 +21,32 @@ import {
   DELETE_LIST,
   WHAT_WANT,
 } from "../words";
+import moment from "moment";
 
 export default ({ screenList, updateList, deleteList, toggleReviseList }) => {
   const [showListVisible, setShowListVisible] = useState(false);
   const completedCount = screenList.todos.filter((todo) => todo.completed)
     .length;
   const remainingCount = screenList.todos.length - completedCount;
+  const colorIndex = backgroundColors.indexOf(screenList.color);
+
+  const remainingDay = () => {
+    const originDate = moment(new Date()).format();
+    const splitDate = originDate.split("-");
+
+    const startDate = moment(
+      `${parseInt(splitDate[0])}.${parseInt(splitDate[1])}.${parseInt(
+        splitDate[2].substring(0, 2)
+      )}`,
+      "YYYY.MM.DD"
+    );
+    const endDate = moment(
+      `${screenList.year}.${screenList.month}.${screenList.date}`,
+      "YYYY.MM.DD"
+    );
+
+    return endDate.diff(startDate, "days");
+  };
 
   const toggleListModal = () => {
     setShowListVisible(!showListVisible);
@@ -52,8 +76,28 @@ export default ({ screenList, updateList, deleteList, toggleReviseList }) => {
           screenList={screenList}
           closeModal={toggleListModal}
           updateList={updateList}
+          remainingDay={remainingDay}
         />
       </Modal>
+      <View
+        style={[
+          styles.remainingContainer,
+          { backgroundColor: backgroundTransparentColors[colorIndex] },
+        ]}
+      >
+        <Text
+          style={[
+            styles.remainingTitle,
+            { color: remainingDay() < 4 ? "red" : colors.blackColor },
+          ]}
+        >
+          {remainingDay() === 0
+            ? `D-Day!!`
+            : remainingDay() > 0
+            ? `D-${remainingDay()}`
+            : `D+${Math.abs(remainingDay())}`}
+        </Text>
+      </View>
       <TouchableOpacity
         style={[
           styles.screenListContainer,
@@ -120,5 +164,18 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "700",
     color: colors.whiteColor,
+  },
+  remainingContainer: {
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    marginHorizontal: 12,
+    alignItems: "center",
+    width: 200,
+    marginBottom: 12,
+  },
+  remainingTitle: {
+    fontSize: 28,
+    fontWeight: "700",
   },
 });

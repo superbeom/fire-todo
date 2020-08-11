@@ -9,6 +9,7 @@ import {
   TextInput,
   Keyboard,
   Alert,
+  Platform,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { colors, backgroundColors } from "../styles";
@@ -22,6 +23,8 @@ import {
   EDIT_TODO_LIST,
   TODO_LIST_NAME,
 } from "../words";
+import IosDatePicker from "./IosDatePicker";
+import AndroidDatePicker from "./AndroidDatePicker";
 
 export default ({
   closeModal,
@@ -31,6 +34,11 @@ export default ({
   closeReviseModal,
   reviseList,
   reviseScreenList,
+  nowOnChange,
+  now,
+  show,
+  setShow,
+  selectDate,
 }) => {
   const [name, setName] = useState(revise ? reviseScreenList.name : "");
   const [borderColor, setBorderColor] = useState(
@@ -111,6 +119,19 @@ export default ({
             />
           </View>
 
+          {Platform.OS === "ios" ? (
+            <IosDatePicker color={color} nowOnChange={nowOnChange} now={now} />
+          ) : (
+            <AndroidDatePicker
+              color={color}
+              nowOnChange={nowOnChange}
+              now={now}
+              show={show}
+              setShow={setShow}
+              selectDate={selectDate}
+            />
+          )}
+
           <TouchableOpacity
             style={[styles.create, { backgroundColor: color }]}
             onPress={revise ? reviseTodo : createTodo}
@@ -136,13 +157,13 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     color: colors.blackColor,
     alignSelf: "center",
-    marginBottom: 16,
   },
   input: {
     borderWidth: StyleSheet.hairlineWidth,
     borderRadius: 6,
     height: 50,
-    marginTop: 8,
+    marginTop: 36,
+    marginBottom: 12,
     paddingHorizontal: 16,
     fontSize: 18,
   },
