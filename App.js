@@ -39,19 +39,31 @@ export default App = () => {
   const [show, setShow] = useState(false);
 
   const setReviseYearMonthDate = (time) => {
-    // 이미 저장할 때 현지 시각(+09:00) 기준으로 저장돼서, 중복으로 또 더해지지 않도록
+    /* 
+      originDate - 이미 저장할 때 현지 시각(+09:00) 기준으로 저장돼서, 중복으로 또 더해지지 않도록
+                 - splitDate를 위해.
+    */
     const originDate = JSON.stringify(new Date(time)).substr(1, 24);
-    const splitDate = originDate.split("-");
-    const checkGetTime = new Date(originDate).getTime();
 
-    setGoalTotalDate(originDate);
+    /*
+      Error 1 - Android - 'Value for value cannot be cast from String to Double'
+      Error 2 - ios -  'value.getTime is not a function'
+      Solution - Date.parse() 이용 - 왜인지는 모르겠는데,, 검색해 보니..
+     */
+    const parseDate = new Date(
+      Date.parse(moment(time).format(`YYYY-MM-DDTHH:mm:ss.sssZ`))
+    );
+    const splitDate = originDate.split("-");
+    const checkGetTime = new Date(parseDate).getTime();
+
+    setGoalTotalDate(parseDate);
     setGoalYear(parseInt(splitDate[0]));
     setGoalMonth(parseInt(splitDate[1]));
     setGoalDate(parseInt(splitDate[2].substring(0, 2)));
-    setSelectDate(originDate);
+    setSelectDate(parseDate);
     setGetTime(checkGetTime);
 
-    return originDate;
+    return parseDate;
   };
 
   const setYearMonthDate = (time, detector) => {
