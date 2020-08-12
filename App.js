@@ -12,6 +12,7 @@ import {
 import AsyncStorage from "@react-native-community/async-storage";
 import { AntDesign } from "@expo/vector-icons";
 import { colors } from "./styles";
+import { APP_NAME, ADD_LIST } from "./words";
 import TodoList from "./components/TodoList";
 import AddListModal from "./components/AddListModal";
 import { randomKeyOne } from "./key";
@@ -36,28 +37,16 @@ export default App = () => {
   const [getTime, setGetTime] = useState(null);
   const [show, setShow] = useState(false);
 
-  const sortScreenLists = () => {
-    const test = screenLists.sort((a, b) => {
-      if (a.getTime > b.getTime) 1;
-      if (a.getTime < b.getTime) -1;
-      return 0;
-    });
-    // console.log("test: ", test);
-    // screenLists.map((screenList) => console.log("screenLists: ", screenLists));
-  };
-
   const setYearMonthDate = (time, detector) => {
     const originDate = moment(time).format();
     const splitDate = originDate.split("-");
+    const checkGetTime = new Date(originDate).getTime();
 
     setGoalYear(parseInt(splitDate[0]));
     setGoalMonth(parseInt(splitDate[1]));
     setGoalDate(parseInt(splitDate[2].substring(0, 2)));
     setSelectDate(originDate);
-
-    if (detector === "change") {
-      setGetTime(new Date(originDate).getTime());
-    }
+    setGetTime(checkGetTime);
   };
 
   const nowOnChange = (event, selectedDate) => {
@@ -209,11 +198,6 @@ export default App = () => {
         await AsyncStorage.setItem("count", "0");
       }
 
-      screenLists.forEach((screenList) =>
-        console.log("screenLists: ", screenLists)
-      );
-      // sortScreenLists();
-
       setYearMonthDate(now, "initialize");
       setLoading(false);
     } catch (error) {
@@ -254,7 +238,7 @@ export default App = () => {
         />
       </Modal>
       <View style={{ flexDirection: "row" }}>
-        <Text style={styles.title}>Todo Secretary</Text>
+        <Text style={styles.title}>{APP_NAME}</Text>
       </View>
 
       <View style={{ marginVertical: 48 }}>
@@ -262,12 +246,20 @@ export default App = () => {
           <AntDesign name={"plus"} size={16} color={colors.blackColor} />
         </TouchableOpacity>
 
-        <Text style={styles.add}>Add List</Text>
+        <Text style={styles.add}>{ADD_LIST}</Text>
       </View>
 
       <View style={{ height: 375, paddingLeft: 32 }}>
         <FlatList
-          data={screenLists}
+          data={screenLists.sort((a, b) => {
+            if (a.getTime > b.getTime) {
+              return 1;
+            } else if (a.getTime < b.getTime) {
+              return -1;
+            } else {
+              return 0;
+            }
+          })}
           keyExtractor={(item) => item.key}
           horizontal={true}
           showsHorizontalScrollIndicator={false}

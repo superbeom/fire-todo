@@ -1,3 +1,7 @@
+export const APP_NAME = "Todo Secretary";
+
+export const ADD_LIST = "Add List";
+
 export const CREATE = "Create";
 
 export const EDIT = "Edit";
