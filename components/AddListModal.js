@@ -22,6 +22,7 @@ import {
   CREATE_TODO_LIST,
   EDIT_TODO_LIST,
   TODO_LIST_NAME,
+  LIGHT_MODE,
 } from "../words";
 import IosDatePicker from "./IosDatePicker";
 import AndroidDatePicker from "./AndroidDatePicker";
@@ -39,6 +40,7 @@ export default ({
   show,
   setShow,
   selectDate,
+  mode,
 }) => {
   const [name, setName] = useState(revise ? reviseScreenList.name : "");
   const [borderColor, setBorderColor] = useState(
@@ -82,22 +84,55 @@ export default ({
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView style={styles.container} behavior={"height"}>
+      <KeyboardAvoidingView
+        style={[
+          styles.container,
+          {
+            backgroundColor:
+              mode === LIGHT_MODE ? colors.whiteColor : colors.blackColor,
+          },
+        ]}
+        behavior={"height"}
+      >
         <TouchableOpacity
           style={{ position: "absolute", top: 64, right: 32 }}
           onPress={revise ? closeReviseModal : closeModal}
         >
-          <AntDesign name={"close"} size={34} color={colors.blackColor} />
+          <AntDesign
+            name={"close"}
+            size={34}
+            color={mode === LIGHT_MODE ? colors.blackColor : colors.whiteColor}
+          />
         </TouchableOpacity>
 
         <View style={{ alignSelf: "stretch", marginHorizontal: 32 }}>
-          <Text style={styles.title}>
+          <Text
+            style={[
+              styles.title,
+              {
+                color:
+                  mode === LIGHT_MODE ? colors.blackColor : colors.whiteColor,
+              },
+            ]}
+          >
             {revise ? EDIT_TODO_LIST : CREATE_TODO_LIST}
           </Text>
 
           <TextInput
-            style={[styles.input, { borderColor: borderColor }]}
+            style={[
+              styles.input,
+              {
+                borderColor: borderColor,
+                color:
+                  mode === LIGHT_MODE ? colors.blackColor : colors.whiteColor,
+              },
+            ]}
             placeholder={TODO_LIST_NAME}
+            placeholderTextColor={
+              mode === LIGHT_MODE
+                ? colors.lightPlaceholderTextColor
+                : colors.darkPlaceholderTextColor
+            }
             onChangeText={(text) => setName(text)}
             value={name}
             onSubmitEditing={revise ? reviseTodo : createTodo}
@@ -120,7 +155,12 @@ export default ({
           </View>
 
           {Platform.OS === "ios" ? (
-            <IosDatePicker color={color} nowOnChange={nowOnChange} now={now} />
+            <IosDatePicker
+              color={color}
+              nowOnChange={nowOnChange}
+              now={now}
+              mode={mode}
+            />
           ) : (
             <AndroidDatePicker
               color={color}
@@ -129,6 +169,7 @@ export default ({
               show={show}
               setShow={setShow}
               selectDate={selectDate}
+              mode={mode}
             />
           )}
 
@@ -155,7 +196,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "800",
-    color: colors.blackColor,
     alignSelf: "center",
   },
   input: {

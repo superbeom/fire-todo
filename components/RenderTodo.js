@@ -14,6 +14,7 @@ import {
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import { colors } from "../styles";
+import { LIGHT_MODE } from "../words";
 
 export default ({
   todo,
@@ -24,6 +25,7 @@ export default ({
   edit,
   newTodo,
   editIndex,
+  mode,
 }) => {
   const renderLeftActions = (progress, dragX) => {
     const trans = dragX.interpolate({
@@ -91,7 +93,13 @@ export default ({
                 : "checkbox-blank-outline"
             }
             size={24}
-            color={todo.completed ? colors.grayColor : colors.blackColor}
+            color={
+              todo.completed
+                ? colors.grayColor
+                : mode === LIGHT_MODE
+                ? colors.blackColor
+                : colors.whiteColor
+            }
             style={{ width: 32 }}
           />
           <Text
@@ -99,7 +107,11 @@ export default ({
               styles.todo,
               {
                 textDecorationLine: todo.completed ? "line-through" : "none",
-                color: todo.completed ? colors.grayColor : colors.blackColor,
+                color: todo.completed
+                  ? colors.grayColor
+                  : mode === LIGHT_MODE
+                  ? colors.blackColor
+                  : colors.whiteColor,
               },
             ]}
           >
@@ -120,7 +132,7 @@ const styles = StyleSheet.create({
   todo: {
     color: colors.blackColor,
     fontWeight: "700",
-    fontSize: 16,
+    fontSize: 18,
   },
   leftAction: {
     flex: 1,

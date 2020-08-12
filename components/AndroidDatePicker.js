@@ -2,8 +2,18 @@ import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import moment from "moment";
+import { colors } from "../styles";
+import { LIGHT_MODE } from "../words";
 
-export default ({ color, nowOnChange, now, show, setShow, selectDate }) => {
+export default ({
+  color,
+  nowOnChange,
+  now,
+  show,
+  setShow,
+  selectDate,
+  mode,
+}) => {
   const stringYear = moment(selectDate).format("YYYY");
   const stringMonth = moment(selectDate).format("MMMM");
   const stringDate = moment(selectDate).format("DD");
@@ -26,6 +36,7 @@ export default ({ color, nowOnChange, now, show, setShow, selectDate }) => {
           fontWeight: "600",
           marginTop: 5,
           marginBottom: 10,
+          color: mode === LIGHT_MODE ? colors.blackColor : colors.whiteColor,
         }}
       >
         Deadline
@@ -34,7 +45,12 @@ export default ({ color, nowOnChange, now, show, setShow, selectDate }) => {
         style={{ marginBottom: 15 }}
         onPress={() => setShow(true)}
       >
-        <Text style={{ fontSize: 24 }}>
+        <Text
+          style={{
+            fontSize: 24,
+            color: mode === LIGHT_MODE ? colors.blackColor : colors.whiteColor,
+          }}
+        >
           {stringMonth} - {stringDate} - {stringYear}
         </Text>
       </TouchableOpacity>

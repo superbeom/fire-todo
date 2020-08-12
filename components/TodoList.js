@@ -10,7 +10,8 @@ import {
 import {
   colors,
   backgroundColors,
-  backgroundTransparentColors,
+  lightBackgroundTransparentColors,
+  darkBackgroundTransparentColors,
 } from "../styles";
 import TodoModal from "./TodoModal";
 import {
@@ -20,10 +21,17 @@ import {
   EDIT_LIST,
   DELETE_LIST,
   WHAT_WANT,
+  LIGHT_MODE,
 } from "../words";
 import moment from "moment";
 
-export default ({ screenList, updateList, deleteList, toggleReviseList }) => {
+export default ({
+  screenList,
+  updateList,
+  deleteList,
+  toggleReviseList,
+  mode,
+}) => {
   const [showListVisible, setShowListVisible] = useState(false);
   const completedCount = screenList.todos.filter((todo) => todo.completed)
     .length;
@@ -77,18 +85,31 @@ export default ({ screenList, updateList, deleteList, toggleReviseList }) => {
           closeModal={toggleListModal}
           updateList={updateList}
           remainingDay={remainingDay}
+          mode={mode}
         />
       </Modal>
       <View
         style={[
           styles.remainingContainer,
-          { backgroundColor: backgroundTransparentColors[colorIndex] },
+          {
+            backgroundColor:
+              mode === LIGHT_MODE
+                ? lightBackgroundTransparentColors[colorIndex]
+                : darkBackgroundTransparentColors[colorIndex],
+          },
         ]}
       >
         <Text
           style={[
             styles.remainingTitle,
-            { color: remainingDay() < 4 ? "red" : colors.blackColor },
+            {
+              color:
+                remainingDay() < 4
+                  ? "red"
+                  : mode === LIGHT_MODE
+                  ? colors.blackColor
+                  : colors.whiteColor,
+            },
           ]}
         >
           {remainingDay() === 0

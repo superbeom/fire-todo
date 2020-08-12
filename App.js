@@ -8,11 +8,12 @@ import {
   Modal,
   ActivityIndicator,
   Platform,
+  Image,
 } from "react-native";
 import AsyncStorage from "@react-native-community/async-storage";
 import { AntDesign } from "@expo/vector-icons";
 import { colors } from "./styles";
-import { APP_NAME, ADD_LIST } from "./words";
+import { APP_NAME, ADD_LIST, LIGHT_MODE, DARK_MODE } from "./words";
 import TodoList from "./components/TodoList";
 import AddListModal from "./components/AddListModal";
 import { randomKeyOne } from "./key";
@@ -37,6 +38,15 @@ export default App = () => {
   const [goalDate, setGoalDate] = useState(null);
   const [getTime, setGetTime] = useState(null);
   const [show, setShow] = useState(false);
+  const [mode, setMode] = useState(null);
+
+  const toggleMode = async () => {
+    setMode(mode === LIGHT_MODE ? DARK_MODE : LIGHT_MODE);
+    await AsyncStorage.setItem(
+      "mode",
+      mode === LIGHT_MODE ? DARK_MODE : LIGHT_MODE
+    );
+  };
 
   const setReviseYearMonthDate = (time) => {
     /* 
@@ -218,6 +228,8 @@ export default App = () => {
     try {
       // await AsyncStorage.clear();
       const storageCount = await AsyncStorage.getItem("count");
+      const storageMode = await AsyncStorage.getItem("mode");
+
       if (storageCount) {
         COUNT = parseInt(storageCount);
 
@@ -239,6 +251,12 @@ export default App = () => {
         await AsyncStorage.setItem("count", "0");
       }
 
+      if (storageMode) {
+        setMode(storageMode);
+      } else {
+        await AsyncStorage.setItem("mode", LIGHT_MODE);
+      }
+
       setYearMonthDate(now, "initialize");
       setLoading(false);
     } catch (error) {
@@ -257,97 +275,171 @@ export default App = () => {
       color={colors.lightBlueColor}
     />
   ) : (
-    <View style={styles.container}>
-      <Modal
-        animationType="slide"
-        visible={addTodoVisible}
-        onRequestClose={toggleAddTodoModal}
-      >
-        <AddListModal
-          closeModal={toggleAddTodoModal}
-          addList={addList}
-          screenLists={screenLists}
-          revise={revise}
-          closeReviseModal={closeReviseModal}
-          reviseList={reviseList}
-          reviseScreenList={reviseScreenList}
-          nowOnChange={nowOnChange}
-          now={now}
-          show={show}
-          setShow={setShow}
-          selectDate={selectDate}
-        />
-      </Modal>
-      <View style={{ flexDirection: "row" }}>
-        <Text style={styles.title}>{APP_NAME}</Text>
-      </View>
-
-      <View style={{ marginVertical: 48 }}>
-        <TouchableOpacity style={styles.addList} onPress={toggleAddTodoModal}>
-          <AntDesign name={"plus"} size={16} color={colors.blackColor} />
-        </TouchableOpacity>
-
-        <Text style={styles.add}>{ADD_LIST}</Text>
-      </View>
-
-      <View style={{ height: 375, paddingLeft: 32 }}>
-        <FlatList
-          data={screenLists.sort((a, b) => {
-            if (a.getTime > b.getTime) {
-              return 1;
-            } else if (a.getTime < b.getTime) {
-              return -1;
-            } else {
-              return 0;
+    <>
+      {Platform.OS === "ios" && (
+        <TouchableOpacity
+          style={{ width: 50, height: 50, zIndex: 5, top: 80, left: 20 }}
+          onPress={toggleMode}
+        >
+          <Image
+            style={{ width: 50, height: 50 }}
+            source={
+              mode === LIGHT_MODE
+                ? require("./assets/moon.png")
+                : require("./assets/sun.png")
             }
-          })}
-          keyExtractor={(item) => item.key}
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <TodoList
-              screenList={item}
-              updateList={updateList}
-              deleteList={deleteList}
-              toggleReviseList={toggleReviseList}
+          />
+        </TouchableOpacity>
+      )}
+      <View
+        style={[
+          styles.container,
+          {
+            backgroundColor:
+              mode === LIGHT_MODE ? colors.whiteColor : colors.blackColor,
+          },
+        ]}
+      >
+        <Modal
+          animationType="slide"
+          visible={addTodoVisible}
+          onRequestClose={toggleAddTodoModal}
+        >
+          <AddListModal
+            closeModal={toggleAddTodoModal}
+            addList={addList}
+            screenLists={screenLists}
+            revise={revise}
+            closeReviseModal={closeReviseModal}
+            reviseList={reviseList}
+            reviseScreenList={reviseScreenList}
+            nowOnChange={nowOnChange}
+            now={now}
+            show={show}
+            setShow={setShow}
+            selectDate={selectDate}
+            mode={mode}
+          />
+        </Modal>
+
+        {Platform.OS === "ios" && (
+          <View style={{ flexDirection: "row" }}>
+            <Text
+              style={[
+                styles.title,
+                {
+                  color:
+                    mode === LIGHT_MODE ? colors.blackColor : colors.whiteColor,
+                },
+              ]}
+            >
+              {APP_NAME}
+            </Text>
+          </View>
+        )}
+
+        {Platform.OS === "android" && (
+          <TouchableOpacity
+            style={{ width: 50, height: 50, left: 130 }}
+            onPress={toggleMode}
+          >
+            <Image
+              style={{ width: 50, height: 50 }}
+              source={
+                mode === LIGHT_MODE
+                  ? require("./assets/moon.png")
+                  : require("./assets/sun.png")
+              }
             />
-          )}
-          keyboardShouldPersistTaps="always"
-        />
+          </TouchableOpacity>
+        )}
+
+        <View style={{ marginVertical: 48 }}>
+          <TouchableOpacity
+            style={[
+              styles.addList,
+              {
+                color:
+                  mode === LIGHT_MODE ? colors.blackColor : colors.whiteColor,
+                borderColor:
+                  mode === LIGHT_MODE ? colors.blackColor : colors.whiteColor,
+              },
+            ]}
+            onPress={toggleAddTodoModal}
+          >
+            <AntDesign
+              name={"plus"}
+              size={16}
+              color={
+                mode === LIGHT_MODE ? colors.blackColor : colors.whiteColor
+              }
+            />
+          </TouchableOpacity>
+
+          <Text
+            style={[
+              styles.add,
+              {
+                color:
+                  mode === LIGHT_MODE ? colors.blackColor : colors.whiteColor,
+              },
+            ]}
+          >
+            {ADD_LIST}
+          </Text>
+        </View>
+
+        <View style={{ height: 375, paddingLeft: 32 }}>
+          <FlatList
+            data={screenLists.sort((a, b) => {
+              if (a.getTime > b.getTime) {
+                return 1;
+              } else if (a.getTime < b.getTime) {
+                return -1;
+              } else {
+                return 0;
+              }
+            })}
+            keyExtractor={(item) => item.key}
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            renderItem={({ item }) => (
+              <TodoList
+                screenList={item}
+                updateList={updateList}
+                deleteList={deleteList}
+                toggleReviseList={toggleReviseList}
+                mode={mode}
+              />
+            )}
+            keyboardShouldPersistTaps="always"
+          />
+        </View>
       </View>
-    </View>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
-  },
-  divider: {
-    backgroundColor: colors.lightBlueColor,
-    height: 1,
-    flex: 1,
-    alignSelf: "center",
+    zIndex: -1,
   },
   title: {
     fontSize: 38,
     fontWeight: "800",
-    color: colors.blackColor,
     paddingHorizontal: 64,
   },
   addList: {
     borderWidth: 2,
-    borderColor: colors.blackColor,
     borderRadius: 4,
     padding: 16,
     justifyContent: "center",
     alignItems: "center",
   },
   add: {
-    color: colors.blackColor,
     fontWeight: "600",
     fontSize: 14,
     marginTop: 8,

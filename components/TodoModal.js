@@ -14,9 +14,9 @@ import {
 import { AntDesign } from "@expo/vector-icons";
 import { colors } from "../styles";
 import RenderTodo from "./RenderTodo";
-import { ALERT_ALREADY_EXISTS, ALERT_BLANK_TODO } from "../words";
+import { ALERT_ALREADY_EXISTS, ALERT_BLANK_TODO, LIGHT_MODE } from "../words";
 
-export default ({ screenList, closeModal, updateList, remainingDay }) => {
+export default ({ screenList, closeModal, updateList, remainingDay, mode }) => {
   const [newTodo, setNewTodo] = useState("");
   const [edit, setEdit] = useState(false);
   const [editTitle, setEditTitle] = useState(null);
@@ -84,12 +84,24 @@ export default ({ screenList, closeModal, updateList, remainingDay }) => {
 
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={"height"}>
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView
+        style={[
+          styles.container,
+          {
+            backgroundColor:
+              mode === LIGHT_MODE ? colors.whiteColor : colors.blackColor,
+          },
+        ]}
+      >
         <TouchableOpacity
           style={{ position: "absolute", top: 64, right: 32, zIndex: 10 }}
           onPress={closeModal}
         >
-          <AntDesign name={"close"} size={34} color={colors.blackColor} />
+          <AntDesign
+            name={"close"}
+            size={34}
+            color={mode === LIGHT_MODE ? colors.blackColor : colors.whiteColor}
+          />
         </TouchableOpacity>
 
         <View
@@ -100,7 +112,16 @@ export default ({ screenList, closeModal, updateList, remainingDay }) => {
           ]}
         >
           <View>
-            <Text style={styles.title} numberOfLines={2}>
+            <Text
+              style={[
+                styles.title,
+                {
+                  color:
+                    mode === LIGHT_MODE ? colors.blackColor : colors.whiteColor,
+                },
+              ]}
+              numberOfLines={2}
+            >
               {screenList.name}
             </Text>
             <Text style={styles.remainingCount}>
@@ -127,6 +148,7 @@ export default ({ screenList, closeModal, updateList, remainingDay }) => {
                 edit={edit}
                 newTodo={newTodo}
                 editIndex={editIndex}
+                mode={mode}
               />
             )}
             contentContainerStyle={{
@@ -139,7 +161,14 @@ export default ({ screenList, closeModal, updateList, remainingDay }) => {
 
         <View style={[styles.section, styles.footer]}>
           <TextInput
-            style={[styles.input, { borderColor: screenList.color }]}
+            style={[
+              styles.input,
+              {
+                borderColor: screenList.color,
+                color:
+                  mode === LIGHT_MODE ? colors.blackColor : colors.whiteColor,
+              },
+            ]}
             onChangeText={(text) => setNewTodo(text)}
             value={newTodo}
             onSubmitEditing={edit ? submitEditTodo : addTodo}
@@ -176,7 +205,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 30,
     fontWeight: "800",
-    color: colors.blackColor,
   },
   remainingCount: {
     fontSize: 20,

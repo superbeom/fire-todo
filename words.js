@@ -29,3 +29,7 @@ export const TODO_LIST_NAME = "Todo List Name";
 export const SERIOUSLY_DELETE_LIST = "Seriously delete list?";
 
 export const WHAT_WANT = "What do you want to do?";
+
+export const LIGHT_MODE = "Light Mode";
+
+export const DARK_MODE = "Dark Mode";
