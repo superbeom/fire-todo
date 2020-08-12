@@ -31,17 +31,40 @@ export default App = () => {
   const [loading, setLoading] = useState(true);
   const [now, setNow] = useState(newDate);
   const [selectDate, setSelectDate] = useState(newDate);
+  const [goalTotalDate, setGoalTotalDate] = useState(null);
   const [goalYear, setGoalYear] = useState(null);
   const [goalMonth, setGoalMonth] = useState(null);
   const [goalDate, setGoalDate] = useState(null);
   const [getTime, setGetTime] = useState(null);
   const [show, setShow] = useState(false);
 
-  const setYearMonthDate = (time, detector) => {
-    const originDate = moment(time).format();
+  const setReviseYearMonthDate = (time) => {
+    // 이미 저장할 때 현지 시각(+09:00) 기준으로 저장돼서, 중복으로 또 더해지지 않도록
+    const originDate = JSON.stringify(new Date(time)).substr(1, 24);
     const splitDate = originDate.split("-");
     const checkGetTime = new Date(originDate).getTime();
 
+    setGoalTotalDate(originDate);
+    setGoalYear(parseInt(splitDate[0]));
+    setGoalMonth(parseInt(splitDate[1]));
+    setGoalDate(parseInt(splitDate[2].substring(0, 2)));
+    setSelectDate(originDate);
+    setGetTime(checkGetTime);
+
+    return originDate;
+  };
+
+  const setYearMonthDate = (time, detector) => {
+    // 자동으로 현지 시각에 맞게 +09:00 추가 됨.
+    const originDate = moment(time).format();
+    const splitDate = originDate.split("-");
+    const checkGetTime = new Date(originDate).getTime();
+    /* Edit List 실행 시,
+    DateTimePicker의 value 값이 아래와 같은 형식이어야 함 */
+    const extractTime = originDate.split("+")[0];
+    const combinateTime = extractTime + ".000Z";
+
+    setGoalTotalDate(combinateTime);
     setGoalYear(parseInt(splitDate[0]));
     setGoalMonth(parseInt(splitDate[1]));
     setGoalDate(parseInt(splitDate[2].substring(0, 2)));
@@ -74,12 +97,11 @@ export default App = () => {
   const closeReviseModal = () => {
     setRevise(false);
     toggleAddTodoModal();
-    setNow(newDate);
-    setYearMonthDate(newDate, "initialize");
   };
 
   const toggleReviseList = (screenList) => {
     setRevise(true);
+    setNow(setReviseYearMonthDate(screenList.totalDate));
     setReviseScreenList(screenList);
     setReviseKey(screenList.key);
     setAddTodoVisible(!addTodoVisible);
@@ -91,6 +113,7 @@ export default App = () => {
       key: (Math.random() + Math.random()).toString(),
       todos: [],
       index: COUNT,
+      totalDate: goalTotalDate,
       year: goalYear,
       month: goalMonth,
       date: goalDate,
@@ -115,6 +138,11 @@ export default App = () => {
         const newList = {
           ...item,
           ...screenList,
+          totalDate: goalTotalDate,
+          year: goalYear,
+          month: goalMonth,
+          date: goalDate,
+          getTime: getTime,
         };
 
         tempIndex = item.index;
@@ -132,7 +160,8 @@ export default App = () => {
 
     setScreenLists((screenLists) => [...tempList]);
     setRevise(false);
-    setNow(new Date());
+    setNow(newDate);
+    setYearMonthDate(newDate, "initialize");
   };
 
   const updateList = (screenList) => {
