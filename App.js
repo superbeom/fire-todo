@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Platform,
   Image,
+  StatusBar,
 } from "react-native";
 import AsyncStorage from "@react-native-community/async-storage";
 import { AntDesign } from "@expo/vector-icons";
@@ -275,7 +276,19 @@ export default App = () => {
       color={colors.lightBlueColor}
     />
   ) : (
-    <>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor:
+          mode === LIGHT_MODE ? colors.whiteColor : colors.blackColor,
+      }}
+    >
+      <StatusBar
+        barStyle={mode === LIGHT_MODE ? "dark-content" : "light-content"}
+        backgroundColor={
+          mode === LIGHT_MODE ? colors.whiteColor : colors.blackColor
+        }
+      />
       {Platform.OS === "ios" && (
         <TouchableOpacity
           style={{ width: 50, height: 50, zIndex: 5, top: 80, left: 20 }}
@@ -416,7 +429,7 @@ export default App = () => {
           />
         </View>
       </View>
-    </>
+    </View>
   );
 };
 

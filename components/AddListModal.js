@@ -95,7 +95,7 @@ export default ({
         behavior={"height"}
       >
         <TouchableOpacity
-          style={{ position: "absolute", top: 64, right: 32 }}
+          style={{ position: "absolute", top: 64, right: 32, zIndex: 5 }}
           onPress={revise ? closeReviseModal : closeModal}
         >
           <AntDesign
@@ -105,7 +105,7 @@ export default ({
           />
         </TouchableOpacity>
 
-        <View style={{ alignSelf: "stretch", marginHorizontal: 32 }}>
+        <View style={{ alignSelf: "stretch", marginHorizontal: 32, zIndex: 1 }}>
           <Text
             style={[
               styles.title,
