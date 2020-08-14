@@ -5,6 +5,8 @@ import {
   View,
   TouchableOpacity,
   Animated,
+  Platform,
+  Alert,
 } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import Swipeable from "react-native-gesture-handler/Swipeable";
@@ -14,7 +16,7 @@ import {
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import { colors } from "../styles";
-import { LIGHT_MODE } from "../words";
+import { LIGHT_MODE, CANCEL, EDIT, DELETE, EDIT_OR_DELETE } from "../words";
 
 export default ({
   todo,
@@ -27,6 +29,32 @@ export default ({
   editIndex,
   mode,
 }) => {
+  const todoItemLongPress = (title, index) => {
+    Alert.alert(
+      EDIT_OR_DELETE,
+      "",
+      [
+        {
+          text: CANCEL,
+          onPress: () => null,
+        },
+        {
+          text: EDIT,
+          onPress: editTodo.bind(this, title, index),
+        },
+        {
+          text: DELETE,
+          onPress: deleteTodo.bind(this, title),
+        },
+      ],
+      /*
+        Alert 띄웠을 때 - 뒤로가기 버튼으로 Alert를 끄려면,
+        4번째 parameter에 { cancelable: true } 설정
+      */
+      { cancelable: true }
+    );
+  };
+
   const renderLeftActions = (progress, dragX) => {
     const trans = dragX.interpolate({
       inputRange: [0, 50, 100, 101],
@@ -85,6 +113,9 @@ export default ({
         <TouchableOpacity
           style={{ flexDirection: "row" }}
           onPress={toggleTodoCompleted.bind(this, index)}
+          onLongPress={
+            Platform.OS === "ios" ? null : todoItemLongPress(todo.title, index)
+          }
         >
           <MaterialCommunityIcons
             name={

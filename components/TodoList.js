@@ -60,17 +60,26 @@ export default ({
     setShowListVisible(!showListVisible);
   };
 
-  const DeleteLongPress = (screenList) => {
-    Alert.alert(SERIOUSLY_DELETE_LIST, "", [
-      {
-        text: CANCEL,
-        onPress: () => null,
-      },
-      {
-        text: DELETE,
-        onPress: deleteList.bind(this, screenList),
-      },
-    ]);
+  const deleteLongPress = (screenList) => {
+    Alert.alert(
+      SERIOUSLY_DELETE_LIST,
+      "",
+      [
+        {
+          text: CANCEL,
+          onPress: () => null,
+        },
+        {
+          text: DELETE,
+          onPress: deleteList.bind(this, screenList),
+        },
+      ],
+      /*
+        Alert 띄웠을 때 - 뒤로가기 버튼으로 Alert를 끄려면,
+        4번째 parameter에 { cancelable: true } 설정
+      */
+      { cancelable: true }
+    );
   };
 
   return (
@@ -126,20 +135,29 @@ export default ({
         ]}
         onPress={toggleListModal}
         onLongPress={() => {
-          Alert.alert(WHAT_WANT, "", [
-            {
-              text: CANCEL,
-              onPress: () => null,
-            },
-            {
-              text: EDIT_LIST,
-              onPress: toggleReviseList.bind(this, screenList),
-            },
-            {
-              text: DELETE_LIST,
-              onPress: DeleteLongPress.bind(this, screenList),
-            },
-          ]);
+          Alert.alert(
+            WHAT_WANT,
+            "",
+            [
+              {
+                text: CANCEL,
+                onPress: () => null,
+              },
+              {
+                text: EDIT_LIST,
+                onPress: toggleReviseList.bind(this, screenList),
+              },
+              {
+                text: DELETE_LIST,
+                onPress: deleteLongPress.bind(this, screenList),
+              },
+            ],
+            /*
+              Alert 띄웠을 때 - 뒤로가기 버튼으로 Alert를 끄려면,
+              4번째 parameter에 { cancelable: true } 설정
+            */
+            { cancelable: true }
+          );
         }}
       >
         <Text style={styles.screenListTitle} numberOfLines={1}>
