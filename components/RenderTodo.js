@@ -114,7 +114,8 @@ export default ({
           style={{ flexDirection: "row" }}
           onPress={toggleTodoCompleted.bind(this, index)}
           onLongPress={
-            Platform.OS === "android" && todoItemLongPress(todo.title, index)
+            Platform.OS === "android" &&
+            todoItemLongPress.bind(this, todo.title, index)
           }
         >
           <MaterialCommunityIcons
