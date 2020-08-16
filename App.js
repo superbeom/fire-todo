@@ -426,7 +426,7 @@ export default App = () => {
 
         <AdMobBanner
           bannerSize="fullBanner"
-          adUnitID="ca-app-pub-3940256099942544/6300978111"
+          adUnitID="ca-app-pub-4979785113165927/8289125429"
           servePersonalizedAds={true}
           onDidFailToReceiveAdWithError={this.bannerError}
         />
