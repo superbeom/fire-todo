@@ -19,6 +19,7 @@ import TodoList from "./components/TodoList";
 import AddListModal from "./components/AddListModal";
 import { randomKeyOne } from "./key";
 import moment from "moment";
+import { AdMobBanner } from "expo-ads-admob";
 
 let COUNT = 0;
 let CHECK_INDEX = 0;
@@ -428,6 +429,13 @@ export default App = () => {
             keyboardShouldPersistTaps="always"
           />
         </View>
+
+        <AdMobBanner
+          bannerSize="fullBanner"
+          adUnitID="ca-app-pub-4979785113165927/8289125429"
+          servePersonalizedAds={true}
+          onDidFailToReceiveAdWithError={this.bannerError}
+        />
       </View>
     </View>
   );
