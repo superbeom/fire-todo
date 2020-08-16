@@ -43,7 +43,7 @@ export default ({ screenList, closeModal, updateList, remainingDay, mode }) => {
     }
 
     setNewTodo("");
-    Keyboard.dismiss();
+    // Keyboard.dismiss(); // 계속 입력할 수 있도록 Keyboard.dismiss()를 없애자.
   };
 
   const editTodo = (title, index) => {

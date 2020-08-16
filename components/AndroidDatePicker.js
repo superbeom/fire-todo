@@ -1,22 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import moment from "moment";
 import { colors } from "../styles";
 import { LIGHT_MODE } from "../words";
 
-export default ({
-  color,
-  nowOnChange,
-  now,
-  show,
-  setShow,
-  selectDate,
-  mode,
-}) => {
+export default ({ color, nowOnChange, now, selectDate, mode }) => {
+  const [show, setShow] = useState(false);
   const stringYear = moment(selectDate).format("YYYY");
   const stringMonth = moment(selectDate).format("MMMM");
   const stringDate = moment(selectDate).format("DD");
+
+  const onChange = (event, selectedDate) => {
+    setShow(false);
+    nowOnChange(event, selectedDate);
+  };
 
   return (
     <View
@@ -60,7 +58,7 @@ export default ({
           value={now}
           mode={"date"}
           display="default"
-          onChange={nowOnChange}
+          onChange={onChange}
           minimumDate={new Date()}
         />
       )}

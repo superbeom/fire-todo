@@ -39,7 +39,6 @@ export default App = () => {
   const [goalMonth, setGoalMonth] = useState(null);
   const [goalDate, setGoalDate] = useState(null);
   const [getTime, setGetTime] = useState(null);
-  const [show, setShow] = useState(false);
   const [mode, setMode] = useState(null);
 
   const toggleMode = async () => {
@@ -105,9 +104,6 @@ export default App = () => {
     } else if (Platform.OS === "android") {
       if (event.type === "set") {
         setNow(currentDate);
-        setShow(false);
-      } else if (event.type === "dismissed") {
-        setShow(false);
       }
     }
   };
@@ -329,8 +325,6 @@ export default App = () => {
             reviseScreenList={reviseScreenList}
             nowOnChange={nowOnChange}
             now={now}
-            show={show}
-            setShow={setShow}
             selectDate={selectDate}
             mode={mode}
           />
@@ -432,7 +426,7 @@ export default App = () => {
 
         <AdMobBanner
           bannerSize="fullBanner"
-          adUnitID="ca-app-pub-4979785113165927/8289125429"
+          adUnitID="ca-app-pub-3940256099942544/6300978111"
           servePersonalizedAds={true}
           onDidFailToReceiveAdWithError={this.bannerError}
         />
