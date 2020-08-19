@@ -30,6 +30,7 @@
     "android": {
       "package": "com.heungdo.todosecretary",
       "versionCode": 1,
+      "permissions": [],
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-4979785113165927~3994657199"
       }
