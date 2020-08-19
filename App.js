@@ -10,6 +10,7 @@ import {
   Platform,
   Image,
   StatusBar,
+  BackHandler,
 } from "react-native";
 import AsyncStorage from "@react-native-community/async-storage";
 import { AntDesign } from "@expo/vector-icons";
@@ -40,6 +41,10 @@ export default App = () => {
   const [goalDate, setGoalDate] = useState(null);
   const [getTime, setGetTime] = useState(null);
   const [mode, setMode] = useState(null);
+
+  BackHandler.addEventListener("hardwareBackPress", () => {
+    BackHandler.exitApp();
+  });
 
   const toggleMode = async () => {
     setMode(mode === LIGHT_MODE ? DARK_MODE : LIGHT_MODE);
