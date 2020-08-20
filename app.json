@@ -23,7 +23,8 @@
         "NSAllowsArbitraryLoadsForMedia": true,
         "NSAllowsArbitraryLoadsInWebContent": true,
         "config": {
-          "googleMobileAdsAppId": "ca-app-pub-4979785113165927~3994657199"
+          // "googleMobileAdsAppId": "ca-app-pub-4979785113165927~3994657199"
+          "googleMobileAdsAppId": "ca-app-pub-3940256099942544~3347511713"
         }
       }
     },
@@ -32,7 +33,8 @@
       "versionCode": 2,
       "permissions": [],
       "config": {
-        "googleMobileAdsAppId": "ca-app-pub-4979785113165927~3994657199"
+        // "googleMobileAdsAppId": "ca-app-pub-4979785113165927~3994657199"
+        "googleMobileAdsAppId": "ca-app-pub-3940256099942544~3347511713"
       }
     },
     "web": {

@@ -7,6 +7,7 @@ import {
   Modal,
   Alert,
 } from "react-native";
+import { vw, vh, vmin, vmax } from "react-native-expo-viewport-units";
 import {
   colors,
   backgroundColors,
@@ -181,40 +182,40 @@ export default ({
 
 const styles = StyleSheet.create({
   screenListContainer: {
-    paddingVertical: 32,
-    paddingHorizontal: 16,
+    width: vw(48),
+    paddingVertical: vh(29) * 0.12,
+    paddingHorizontal: vh(29) * 0.08,
     borderRadius: 6,
-    marginHorizontal: 12,
+    marginHorizontal: vw(48) * 0.06,
     alignItems: "center",
-    width: 200,
   },
   screenListTitle: {
-    fontSize: 24,
+    fontSize: vw(6),
     fontWeight: "700",
     color: colors.whiteColor,
-    marginBottom: 18,
+    marginBottom: vw(4),
   },
   count: {
-    fontSize: 48,
+    fontSize: vw(12),
     fontWeight: "200",
     color: colors.whiteColor,
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: vw(3),
     fontWeight: "700",
     color: colors.whiteColor,
   },
   remainingContainer: {
-    paddingVertical: 16,
-    paddingHorizontal: 16,
+    width: vw(48),
+    paddingVertical: vw(48) * 0.08,
+    paddingHorizontal: vh(29) * 0.08,
     borderRadius: 6,
-    marginHorizontal: 12,
+    marginHorizontal: vw(48) * 0.06,
     alignItems: "center",
-    width: 200,
-    marginBottom: 12,
+    marginBottom: vh(1.3),
   },
   remainingTitle: {
-    fontSize: 28,
+    fontSize: vw(48) * 0.14,
     fontWeight: "700",
   },
 });

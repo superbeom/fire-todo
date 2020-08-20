@@ -94,7 +94,7 @@ export default ({ screenList, closeModal, updateList, remainingDay, mode }) => {
         ]}
       >
         <TouchableOpacity
-          style={{ position: "absolute", top: 64, right: 32, zIndex: 10 }}
+          style={{ position: "absolute", top: 48, right: 32, zIndex: 10 }}
           onPress={closeModal}
         >
           <AntDesign

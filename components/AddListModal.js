@@ -93,9 +93,10 @@ export default ({
           },
         ]}
         behavior={"height"}
+        enabled={false}
       >
         <TouchableOpacity
-          style={{ position: "absolute", top: 64, right: 32, zIndex: 5 }}
+          style={{ position: "absolute", top: 48, right: 32, zIndex: 5 }}
           onPress={revise ? closeReviseModal : closeModal}
         >
           <AntDesign
