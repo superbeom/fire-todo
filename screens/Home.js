@@ -25,8 +25,7 @@ import { AdMobBanner } from "expo-ads-admob";
 let COUNT = 0;
 let CHECK_INDEX = 0;
 
-// export default ({ route, navigation }) => {
-export default React.memo(({ route, navigation }) => {
+export default React.memo(({ navigation, route }) => {
   const newDate = new Date();
   const [addTodoVisible, setAddTodoVisible] = useState(false);
   const [screenLists, setScreenLists] = useState([]);
@@ -42,7 +41,6 @@ export default React.memo(({ route, navigation }) => {
   const [goalDate, setGoalDate] = useState(null);
   const [getTime, setGetTime] = useState(null);
   const [mode, setMode] = useState(null);
-  const { setMainMode } = route.params;
 
   BackHandler.addEventListener("hardwareBackPress", () => {
     BackHandler.exitApp();
@@ -50,12 +48,10 @@ export default React.memo(({ route, navigation }) => {
 
   const toggleMode = async () => {
     setMode(mode === LIGHT_MODE ? DARK_MODE : LIGHT_MODE);
-    setMainMode(mode === LIGHT_MODE ? DARK_MODE : LIGHT_MODE);
     await AsyncStorage.setItem(
       "mode",
       mode === LIGHT_MODE ? DARK_MODE : LIGHT_MODE
     );
-    navigation.setParams({ mode });
   };
 
   const setReviseYearMonthDate = (time) => {
@@ -233,7 +229,7 @@ export default React.memo(({ route, navigation }) => {
 
   const preLoad = async () => {
     try {
-      //   await AsyncStorage.clear();
+      // await AsyncStorage.clear();
       const storageCount = await AsyncStorage.getItem("count");
       const storageMode = await AsyncStorage.getItem("mode");
 
@@ -260,7 +256,6 @@ export default React.memo(({ route, navigation }) => {
 
       if (storageMode) {
         setMode(storageMode);
-        setMainMode(storageMode);
       } else {
         await AsyncStorage.setItem("mode", LIGHT_MODE);
       }
@@ -306,7 +301,13 @@ export default React.memo(({ route, navigation }) => {
       />
       <View style={{ flex: 0.7 }}></View>
 
-      <View style={styles.headerToggleMode}>
+      {/* <View style={styles.headerToggleMode}> */}
+      <View
+        style={[
+          styles.headerToggleMode,
+          { flexDirection: "row", justifyContent: "space-between" },
+        ]}
+      >
         <TouchableOpacity
           style={{ width: vmax(6), height: vmax(6), left: 10, zIndex: 5 }}
           onPress={toggleMode}
@@ -317,6 +318,33 @@ export default React.memo(({ route, navigation }) => {
               mode === LIGHT_MODE
                 ? require("../assets/sun.png")
                 : require("../assets/moon.png")
+            }
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            width: vmax(6),
+            height: vmax(6),
+            right: 10,
+            zIndex: 5,
+          }}
+          onPress={() =>
+            navigation.navigate("Calendar", {
+              mode,
+              screenLists,
+            })
+          }
+        >
+          <Image
+            style={{
+              width: vmax(6),
+              height: vmax(6),
+              right: 10,
+            }}
+            source={
+              mode === LIGHT_MODE
+                ? require("../assets/lightCalendar.png")
+                : require("../assets/darkCalendar.png")
             }
           />
         </TouchableOpacity>
@@ -352,7 +380,6 @@ export default React.memo(({ route, navigation }) => {
           <AntDesign
             name={"plus"}
             size={16}
-            // size={vw(3)}
             color={mode === LIGHT_MODE ? colors.blackColor : colors.whiteColor}
           />
         </TouchableOpacity>

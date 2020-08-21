@@ -7,7 +7,7 @@ import {
   Modal,
   Alert,
 } from "react-native";
-import { vw, vh, vmin, vmax } from "react-native-expo-viewport-units";
+import { vw, vh } from "react-native-expo-viewport-units";
 import {
   colors,
   backgroundColors,
@@ -25,15 +25,6 @@ import {
   LIGHT_MODE,
 } from "../words";
 import moment from "moment";
-
-/*
-props
-  screenList,
-  updateList,
-  deleteList,
-  toggleReviseList,
-  mode,
-*/
 
 class TodoList extends PureComponent {
   state = {
