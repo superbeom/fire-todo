@@ -11,13 +11,16 @@ const TabNavigation = createBottomTabNavigator();
 export default ({ mainMode, setMainMode }) => {
   return (
     <TabNavigation.Navigator
-      initialRouteName="Home"
+      // initialRouteName="Home"
+      initialRouteName="Calendar"
       tabBarOptions={{
         tabStyle: {
           backgroundColor:
             mainMode === LIGHT_MODE ? colors.whiteColor : colors.blackColor,
+          activeTintColor: "lightblue",
         },
         showLabel: false,
+        activeTintColor: "lightblue",
       }}
     >
       <TabNavigation.Screen
@@ -39,6 +42,13 @@ export default ({ mainMode, setMainMode }) => {
       <TabNavigation.Screen
         name="Calendar"
         component={Calendar}
+        listeners={({ navigation }) => ({
+          tabPress: (event) => {
+            // Prevent default action
+            event.preventDefault();
+            navigation.navigate("Calendar", { mode: mainMode });
+          },
+        })}
         options={{
           tabBarIcon: () => (
             <FontAwesome

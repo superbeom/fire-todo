@@ -25,7 +25,8 @@ import { AdMobBanner } from "expo-ads-admob";
 let COUNT = 0;
 let CHECK_INDEX = 0;
 
-export default ({ route }) => {
+// export default ({ route, navigation }) => {
+export default React.memo(({ route, navigation }) => {
   const newDate = new Date();
   const [addTodoVisible, setAddTodoVisible] = useState(false);
   const [screenLists, setScreenLists] = useState([]);
@@ -54,10 +55,7 @@ export default ({ route }) => {
       "mode",
       mode === LIGHT_MODE ? DARK_MODE : LIGHT_MODE
     );
-    await AsyncStorage.setItem(
-      "mainMode",
-      mode === LIGHT_MODE ? DARK_MODE : LIGHT_MODE
-    );
+    navigation.setParams({ mode });
   };
 
   const setReviseYearMonthDate = (time) => {
@@ -265,7 +263,6 @@ export default ({ route }) => {
         setMainMode(storageMode);
       } else {
         await AsyncStorage.setItem("mode", LIGHT_MODE);
-        await AsyncStorage.setItem("mainMode", LIGHT_MODE);
       }
 
       setYearMonthDate(now, "initialize");
@@ -307,7 +304,7 @@ export default ({ route }) => {
           mode === LIGHT_MODE ? colors.whiteColor : colors.blackColor
         }
       />
-      <View style={[styles.header, { flex: 0.7 }]}></View>
+      <View style={{ flex: 0.7 }}></View>
 
       <View style={styles.headerToggleMode}>
         <TouchableOpacity
@@ -318,8 +315,8 @@ export default ({ route }) => {
             style={{ width: vmax(6), height: vmax(6), left: 10 }}
             source={
               mode === LIGHT_MODE
-                ? require("../assets/moon.png")
-                : require("../assets/sun.png")
+                ? require("../assets/sun.png")
+                : require("../assets/moon.png")
             }
           />
         </TouchableOpacity>
@@ -430,23 +427,20 @@ export default ({ route }) => {
         </View>
       </View>
       <View style={styles.admob}>
-        <AdMobBanner
+        {/* <AdMobBanner
           //   bannerSize="fullBanner"
           bannerSize="banner"
           // adUnitID="ca-app-pub-4979785113165927/8289125429" // This is my ID
           adUnitID="ca-app-pub-3940256099942544/6300978111" // This is test ID
           servePersonalizedAds={true}
           onDidFailToReceiveAdWithError={this.bannerError}
-        />
+        /> */}
       </View>
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
-  header: {
-    flex: 1,
-  },
   headerToggleMode: {
     flex: 1,
   },

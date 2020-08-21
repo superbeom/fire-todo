@@ -1,24 +1,38 @@
-export const darkMode = "#2d3436";
-export const lightMode = "#FFFFFF";
+const darkMode = "#2d3436";
+const lightMode = "#FFFFFF";
+
+const pinkColor = "#e84393";
+const yellowColor = "#fdcb6e";
+const greenColor = "#00b894";
+const blueColor = "#0984e3";
+const purpleColor = "#6c5ce7";
+const lightPinkColor = "#ed89fa";
 
 export const colors = {
   blackColor: darkMode,
   grayColor: "#A4A4A4",
-  lightGrayColor: "#CACACA",
-  blueColor: "#24A6D9",
-  lightBlueColor: "#A7CBD9",
   whiteColor: lightMode,
   lightPlaceholderTextColor: "#C7C7CD",
   darkPlaceholderTextColor: "#98989c",
+  pinkColor: pinkColor,
+  yellowColor: yellowColor,
+  greenColor: greenColor,
+  blueColor: blueColor,
+  purpleColor: purpleColor,
+  lightPinkColor: lightPinkColor,
+  calendarTextDisabledLightModeColor: "rgba(45, 52, 54, 0.1)",
+  calendarTextDisabledDarkModeColor: "rgba(255, 255, 255, 0.1)",
+  calendarThemeBackgroundLightModeColor: "#f5f5f5",
+  calendarThemeBackgroundDarkModeColor: "#3d4142",
 };
 
 export const backgroundColors = [
-  "#e84393",
-  "#fdcb6e",
-  "#00b894",
-  "#0984e3",
-  "#6c5ce7",
-  "#ed89fa",
+  pinkColor,
+  yellowColor,
+  greenColor,
+  blueColor,
+  purpleColor,
+  lightPinkColor,
 ];
 
 export const lightBackgroundTransparentColors = [
