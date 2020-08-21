@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { PureComponent } from "react";
 import {
   StyleSheet,
   Text,
@@ -26,42 +26,29 @@ import {
 } from "../words";
 import moment from "moment";
 
-export default ({
+/*
+props
   screenList,
   updateList,
   deleteList,
   toggleReviseList,
   mode,
-}) => {
-  const [showListVisible, setShowListVisible] = useState(false);
-  const completedCount = screenList.todos.filter((todo) => todo.completed)
-    .length;
-  const remainingCount = screenList.todos.length - completedCount;
-  const colorIndex = backgroundColors.indexOf(screenList.color);
+*/
 
-  const remainingDay = () => {
-    const originDate = moment(new Date()).format();
-    const splitDate = originDate.split("-");
-
-    const startDate = moment(
-      `${parseInt(splitDate[0])}.${parseInt(splitDate[1])}.${parseInt(
-        splitDate[2].substring(0, 2)
-      )}`,
-      "YYYY.MM.DD"
-    );
-    const endDate = moment(
-      `${screenList.year}.${screenList.month}.${screenList.date}`,
-      "YYYY.MM.DD"
-    );
-
-    return endDate.diff(startDate, "days");
+class TodoList extends PureComponent {
+  state = {
+    showListVisible: false,
   };
 
-  const toggleListModal = () => {
-    setShowListVisible(!showListVisible);
+  setShowListVisible = (visible) => {
+    this.setState({ showListVisible: visible });
   };
 
-  const deleteLongPress = (screenList) => {
+  toggleListModal = (showListVisible) => {
+    this.setShowListVisible(!showListVisible);
+  };
+
+  deleteLongPress = (screenList, deleteList) => {
     Alert.alert(
       SERIOUSLY_DELETE_LIST,
       "",
@@ -83,102 +70,135 @@ export default ({
     );
   };
 
-  return (
-    <View>
-      <Modal
-        animationType="slide"
-        visible={showListVisible}
-        onRequestClose={toggleListModal}
-      >
-        <TodoModal
-          screenList={screenList}
-          closeModal={toggleListModal}
-          updateList={updateList}
-          remainingDay={remainingDay}
-          mode={mode}
-        />
-      </Modal>
-      <View
-        style={[
-          styles.remainingContainer,
-          {
-            backgroundColor:
-              mode === LIGHT_MODE
-                ? lightBackgroundTransparentColors[colorIndex]
-                : darkBackgroundTransparentColors[colorIndex],
-          },
-        ]}
-      >
-        <Text
+  render() {
+    const { showListVisible } = this.state;
+    const {
+      screenList,
+      updateList,
+      deleteList,
+      toggleReviseList,
+      mode,
+    } = this.props;
+
+    const completedCount = screenList.todos.filter((todo) => todo.completed)
+      .length;
+    const remainingCount = screenList.todos.length - completedCount;
+    const colorIndex = backgroundColors.indexOf(screenList.color);
+
+    const originDate = moment(new Date()).format();
+    const splitDate = originDate.split("-");
+    const startDate = moment(
+      `${parseInt(splitDate[0])}.${parseInt(splitDate[1])}.${parseInt(
+        splitDate[2].substring(0, 2)
+      )}`,
+      "YYYY.MM.DD"
+    );
+    const endDate = moment(
+      `${screenList.year}.${screenList.month}.${screenList.date}`,
+      "YYYY.MM.DD"
+    );
+    const remainingDay = endDate.diff(startDate, "days");
+
+    return (
+      <View>
+        <Modal
+          animationType="slide"
+          visible={showListVisible}
+          onRequestClose={this.toggleListModal.bind(this, showListVisible)}
+        >
+          <TodoModal
+            screenList={screenList}
+            closeModal={this.toggleListModal.bind(this, showListVisible)}
+            showListVisible={showListVisible}
+            updateList={updateList}
+            remainingDay={remainingDay}
+            mode={mode}
+          />
+        </Modal>
+        <View
           style={[
-            styles.remainingTitle,
+            styles.remainingContainer,
             {
-              color:
-                remainingDay() < 4
-                  ? "red"
-                  : mode === LIGHT_MODE
-                  ? colors.blackColor
-                  : colors.whiteColor,
+              backgroundColor:
+                mode === LIGHT_MODE
+                  ? lightBackgroundTransparentColors[colorIndex]
+                  : darkBackgroundTransparentColors[colorIndex],
             },
           ]}
         >
-          {remainingDay() === 0
-            ? `D-Day!!`
-            : remainingDay() > 0
-            ? `D-${remainingDay()}`
-            : `D+${Math.abs(remainingDay())}`}
-        </Text>
-      </View>
-      <TouchableOpacity
-        style={[
-          styles.screenListContainer,
-          { backgroundColor: screenList.color },
-        ]}
-        onPress={toggleListModal}
-        onLongPress={() => {
-          Alert.alert(
-            WHAT_WANT,
-            "",
-            [
+          <Text
+            style={[
+              styles.remainingTitle,
               {
-                text: CANCEL,
-                onPress: () => null,
+                color:
+                  remainingDay < 4
+                    ? "red"
+                    : mode === LIGHT_MODE
+                    ? colors.blackColor
+                    : colors.whiteColor,
               },
-              {
-                text: EDIT_LIST,
-                onPress: toggleReviseList.bind(this, screenList),
-              },
-              {
-                text: DELETE_LIST,
-                onPress: deleteLongPress.bind(this, screenList),
-              },
-            ],
-            /*
-              Alert 띄웠을 때 - 뒤로가기 버튼으로 Alert를 끄려면,
-              4번째 parameter에 { cancelable: true } 설정
-            */
-            { cancelable: true }
-          );
-        }}
-      >
-        <Text style={styles.screenListTitle} numberOfLines={1}>
-          {screenList.name}
-        </Text>
-
-        <View>
-          <View style={{ alignItems: "center" }}>
-            <Text style={styles.count}>{remainingCount}</Text>
-            <Text style={styles.subtitle}>Remaining</Text>
-          </View>
-          <View style={{ alignItems: "center" }}>
-            <Text style={styles.count}>{completedCount}</Text>
-            <Text style={styles.subtitle}>Completed</Text>
-          </View>
+            ]}
+          >
+            {remainingDay === 0
+              ? `D-Day!!`
+              : remainingDay > 0
+              ? `D-${remainingDay}`
+              : `D+${Math.abs(remainingDay)}`}
+          </Text>
         </View>
-      </TouchableOpacity>
-    </View>
-  );
-};
+        <TouchableOpacity
+          style={[
+            styles.screenListContainer,
+            { backgroundColor: screenList.color },
+          ]}
+          onPress={this.toggleListModal.bind(this, showListVisible)}
+          onLongPress={() => {
+            Alert.alert(
+              WHAT_WANT,
+              "",
+              [
+                {
+                  text: CANCEL,
+                  onPress: () => null,
+                },
+                {
+                  text: EDIT_LIST,
+                  onPress: toggleReviseList(screenList),
+                },
+                {
+                  text: DELETE_LIST,
+                  onPress: this.deleteLongPress(screenList, deleteList),
+                },
+              ],
+              /*
+                Alert 띄웠을 때 - 뒤로가기 버튼으로 Alert를 끄려면,
+                4번째 parameter에 { cancelable: true } 설정
+              */
+              { cancelable: true }
+            );
+          }}
+        >
+          <Text style={styles.screenListTitle} numberOfLines={1}>
+            {screenList.name}
+          </Text>
+
+          <View>
+            <View style={{ alignItems: "center" }}>
+              <Text style={styles.count}>{remainingCount}</Text>
+              <Text style={styles.subtitle}>Remaining</Text>
+            </View>
+            <View style={{ alignItems: "center" }}>
+              <Text style={styles.count}>{completedCount}</Text>
+              <Text style={styles.subtitle}>Completed</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+}
+
+export default TodoList;
 
 const styles = StyleSheet.create({
   screenListContainer: {

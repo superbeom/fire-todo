@@ -125,11 +125,11 @@ export default ({ screenList, closeModal, updateList, remainingDay, mode }) => {
               {screenList.name}
             </Text>
             <Text style={styles.remainingCount}>
-              {remainingDay() === 0
+              {remainingDay === 0
                 ? `D-Day!!`
-                : remainingDay() > 0
-                ? `D-${remainingDay()}`
-                : `D+${Math.abs(remainingDay())}`}
+                : remainingDay > 0
+                ? `D-${remainingDay}`
+                : `D+${Math.abs(remainingDay)}`}
             </Text>
           </View>
         </View>
