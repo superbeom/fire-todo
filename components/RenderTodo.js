@@ -19,7 +19,14 @@ import { colors } from "../styles";
 import { LIGHT_MODE, CANCEL, EDIT, DELETE, EDIT_OR_DELETE } from "../words";
 
 class RenderTodo extends PureComponent {
-  todoItemLongPress = (title, index, editTodo, deleteTodo) => {
+  todoItemLongPress = (
+    title,
+    index,
+    editTodo,
+    deleteTodo,
+    screenList,
+    updateList
+  ) => {
     Alert.alert(
       EDIT_OR_DELETE,
       "",
@@ -34,7 +41,7 @@ class RenderTodo extends PureComponent {
         },
         {
           text: DELETE,
-          onPress: deleteTodo.bind(this, title),
+          onPress: deleteTodo.bind(this, title, screenList, updateList),
         },
       ],
       /*
@@ -99,6 +106,8 @@ class RenderTodo extends PureComponent {
       toggleTodoCompleted,
       editTodo,
       deleteTodo,
+      screenList,
+      updateList,
       edit,
       newTodo,
       editIndex,
@@ -110,12 +119,22 @@ class RenderTodo extends PureComponent {
         renderLeftActions={this.renderLeftActions}
         renderRightActions={this.renderRightActions}
         onSwipeableLeftOpen={editTodo.bind(this, todo.title, index)}
-        onSwipeableRightOpen={deleteTodo.bind(this, todo.title)}
+        onSwipeableRightOpen={deleteTodo.bind(
+          this,
+          todo.title,
+          screenList,
+          updateList
+        )}
       >
         <View style={styles.todoContainer}>
           <TouchableOpacity
             style={{ flexDirection: "row" }}
-            onPress={toggleTodoCompleted.bind(this, index)}
+            onPress={toggleTodoCompleted.bind(
+              this,
+              screenList,
+              updateList,
+              index
+            )}
             onLongPress={
               Platform.OS === "android" &&
               this.todoItemLongPress.bind(
@@ -123,7 +142,9 @@ class RenderTodo extends PureComponent {
                 todo.title,
                 index,
                 editTodo,
-                deleteTodo
+                deleteTodo,
+                screenList,
+                updateList
               )
             }
           >
