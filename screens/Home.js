@@ -42,9 +42,9 @@ export default React.memo(({ navigation, route }) => {
   const [getTime, setGetTime] = useState(null);
   const [mode, setMode] = useState(null);
 
-  BackHandler.addEventListener("hardwareBackPress", () => {
-    BackHandler.exitApp();
-  });
+  // BackHandler.addEventListener("hardwareBackPress", () => {
+  //   BackHandler.exitApp();
+  // });
 
   const toggleMode = async () => {
     setMode(mode === LIGHT_MODE ? DARK_MODE : LIGHT_MODE);
@@ -301,7 +301,6 @@ export default React.memo(({ navigation, route }) => {
       />
       <View style={{ flex: 0.7 }}></View>
 
-      {/* <View style={styles.headerToggleMode}> */}
       <View
         style={[
           styles.headerToggleMode,
@@ -332,6 +331,7 @@ export default React.memo(({ navigation, route }) => {
             navigation.navigate("Calendar", {
               mode,
               screenLists,
+              updateList,
             })
           }
         >

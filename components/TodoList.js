@@ -100,7 +100,6 @@ class TodoList extends PureComponent {
           <TodoModal
             screenList={screenList}
             closeModal={this.toggleListModal.bind(this, showListVisible)}
-            showListVisible={showListVisible}
             updateList={updateList}
             remainingDay={remainingDay}
             mode={mode}

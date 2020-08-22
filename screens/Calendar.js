@@ -1,12 +1,18 @@
 import React, { PureComponent } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, Alert } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  Alert,
+  Modal,
+} from "react-native";
 import { Agenda } from "react-native-calendars";
 import { vw, vh, vmin, vmax } from "react-native-expo-viewport-units";
+import TodoModal from "../components/TodoModal";
 import { colors } from "../styles";
 import { LIGHT_MODE } from "../words";
 import moment from "moment";
-
-let count = 0;
 
 class Calendar extends PureComponent {
   state = {
@@ -14,6 +20,9 @@ class Calendar extends PureComponent {
     markingItems: {},
     scheduleItems: [],
     markedDates: {},
+    showListVisible: false,
+    screenList: {},
+    remainingDay: 0,
   };
 
   static getDerivedStateFromProps(props, state) {
@@ -42,13 +51,28 @@ class Calendar extends PureComponent {
     }
   }
 
+  setShowListVisible = (visible, targetScreenList, targetRemainingDay) => {
+    this.setState({
+      showListVisible: visible,
+      screenList: targetScreenList,
+      remainingDay: targetRemainingDay,
+    });
+  };
+
+  toggleListModal = (showListVisible, targetScreenList, targetRemainingDay) => {
+    this.setShowListVisible(
+      !showListVisible,
+      targetScreenList,
+      targetRemainingDay
+    );
+  };
+
   timeToString = (time) => {
     const date = moment(time).format();
     return date.split("T")[0];
   };
 
   loadItems = (items, markingItems, scheduleItems, markedDates, day) => {
-    // console.log("day: ", day);
     for (let i = 0; i < 85; i++) {
       const time = day.timestamp + i * 24 * 60 * 60 * 1000;
       const strTime = this.timeToString(time);
@@ -84,18 +108,30 @@ class Calendar extends PureComponent {
         markedNewItems[key] = markedDates[key][0];
       }
     });
-    if (count === 0) {
-      /*
-        처음엔 markedDates가 제대로 들어 가는데,
-        3번 로드돼서, 2번째와 3번째에는 빈 {}가 들어감.
-        그래서 count 처리.
-      */
+
+    if (Object.keys(markedNewItems).length > 0) {
       this.setState({ items: newItems, markedDates: markedNewItems });
-      count++;
     }
   };
 
-  renderItem = (item) => {
+  renderItem = (showListVisible, screenLists, item) => {
+    const targetScreenList = screenLists.filter(
+      (screenList) => screenList.name === item.name
+    )[0];
+    const originDate = moment(new Date()).format();
+    const splitDate = originDate.split("-");
+    const startDate = moment(
+      `${parseInt(splitDate[0])}.${parseInt(splitDate[1])}.${parseInt(
+        splitDate[2].substring(0, 2)
+      )}`,
+      "YYYY.MM.DD"
+    );
+    const endDate = moment(
+      `${targetScreenList.year}.${targetScreenList.month}.${targetScreenList.date}`,
+      "YYYY.MM.DD"
+    );
+    const targetRemainingDay = endDate.diff(startDate, "days");
+
     return (
       <TouchableOpacity
         style={[
@@ -104,7 +140,29 @@ class Calendar extends PureComponent {
             backgroundColor: item.color,
           },
         ]}
-        onPress={() => Alert.alert(item.name)}
+        onPress={this.toggleListModal.bind(
+          this,
+          showListVisible,
+          targetScreenList,
+          targetRemainingDay
+        )}
+        onLongPress={() => {
+          Alert.alert(
+            "WHAT_WANT",
+            "",
+            [
+              {
+                text: "CANCEL",
+                onPress: () => null,
+              },
+            ],
+            /*
+              Alert 띄웠을 때 - 뒤로가기 버튼으로 Alert를 끄려면,
+              4번째 parameter에 { cancelable: true } 설정
+            */
+            { cancelable: true }
+          );
+        }}
       >
         <Text style={styles.itemText}>{item.name}</Text>
       </TouchableOpacity>
@@ -112,10 +170,16 @@ class Calendar extends PureComponent {
   };
 
   renderEmptyDate = (day) => {
-    const selectedDay = moment(day).format().split("T")[0];
+    // const selectedDay = day.split("T")[0];
     return (
       <View style={styles.emptyDate}>
-        <TouchableOpacity style={styles.emptyDateButton} onPress={() => null}>
+        <TouchableOpacity
+          style={styles.emptyDateButton}
+          onPress={() => {
+            // console.log("day: ", day, typeof day);
+            return null;
+          }}
+        >
           <Text style={styles.emptyDateText}>+</Text>
         </TouchableOpacity>
       </View>
@@ -123,12 +187,22 @@ class Calendar extends PureComponent {
   };
 
   render() {
-    const { items, markingItems, scheduleItems, markedDates } = this.state;
-    const { mode } = this.props.route.params;
+    const {
+      items,
+      markingItems,
+      scheduleItems,
+      markedDates,
+      showListVisible,
+      screenList,
+      remainingDay,
+    } = this.state;
+    const { mode, screenLists, updateList } = this.props.route.params;
     const lightWhiteTheme =
       mode === LIGHT_MODE ? colors.whiteColor : colors.blackColor;
     const lightblackTheme =
       mode === LIGHT_MODE ? colors.blackColor : colors.whiteColor;
+
+    console.log("Calendar");
 
     return (
       <View
@@ -137,6 +211,24 @@ class Calendar extends PureComponent {
           backgroundColor: lightWhiteTheme,
         }}
       >
+        <Modal
+          animationType="slide"
+          visible={showListVisible}
+          onRequestClose={this.toggleListModal.bind(
+            this,
+            showListVisible,
+            [],
+            0
+          )}
+        >
+          <TodoModal
+            screenList={screenList}
+            closeModal={this.toggleListModal.bind(this, showListVisible, [], 0)}
+            updateList={updateList}
+            remainingDay={remainingDay}
+            mode={mode}
+          />
+        </Modal>
         <View style={{ flex: 0.6 }}></View>
         <View style={{ flex: 12 }}>
           <Agenda
@@ -150,7 +242,11 @@ class Calendar extends PureComponent {
               scheduleItems,
               markedDates
             )}
-            renderItem={this.renderItem}
+            renderItem={this.renderItem.bind(
+              this,
+              showListVisible,
+              screenLists
+            )}
             renderEmptyDate={this.renderEmptyDate}
             markingType={"multi-dot"}
             markedDates={markedDates}
