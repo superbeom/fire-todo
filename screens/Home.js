@@ -314,7 +314,15 @@ export default React.memo(({ navigation, route }) => {
         ]}
       >
         <TouchableOpacity
-          style={{ width: vmax(6), height: vmax(6), left: 10, zIndex: 5 }}
+          style={[
+            styles.toggleModeContainer,
+            {
+              shadowColor:
+                mode === LIGHT_MODE
+                  ? colors.lightYellowColor
+                  : colors.whiteColor,
+            },
+          ]}
           onPress={toggleMode}
         >
           <Image
@@ -327,27 +335,11 @@ export default React.memo(({ navigation, route }) => {
           />
         </TouchableOpacity>
         <TouchableOpacity
-          style={{
-            width: vmax(6),
-            height: vmax(6),
-            right: 10,
-            zIndex: 5,
-          }}
-          // onPress={() =>
-          //   navigation.navigate("Calendar", {
-          //     mode,
-          //     screenLists,
-          //     updateList,
-          //   })
-          // }
+          style={{ width: vmax(6), height: vmax(6), right: 10, zIndex: 5 }}
           onPress={() => setShowCalendar(true)}
         >
           <Image
-            style={{
-              width: vmax(6),
-              height: vmax(6),
-              right: 10,
-            }}
+            style={{ width: vmax(6), height: vmax(6), right: 10 }}
             source={
               mode === LIGHT_MODE
                 ? require("../assets/lightCalendar.png")
@@ -448,7 +440,15 @@ export default React.memo(({ navigation, route }) => {
           />
         </Modal>
 
-        <View style={{ height: vh(48) }}>
+        <View
+          style={[
+            styles.flatListContainer,
+            {
+              shadowColor:
+                mode === LIGHT_MODE ? colors.blackColor : colors.whiteColor,
+            },
+          ]}
+        >
           <FlatList
             data={screenLists.sort((a, b) => {
               if (a.getTime > b.getTime) {
@@ -477,7 +477,6 @@ export default React.memo(({ navigation, route }) => {
       </View>
       <View style={styles.admob}>
         {/* <AdMobBanner
-          //   bannerSize="fullBanner"
           bannerSize="banner"
           // adUnitID="ca-app-pub-4979785113165927/8289125429" // This is my ID
           adUnitID="ca-app-pub-3940256099942544/6300978111" // This is test ID
@@ -492,6 +491,19 @@ export default React.memo(({ navigation, route }) => {
 const styles = StyleSheet.create({
   headerToggleMode: {
     flex: 1,
+  },
+  toggleModeContainer: {
+    width: vmax(6),
+    height: vmax(6),
+    left: 10,
+    zIndex: 5,
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    shadowOpacity: 0.37,
+    shadowRadius: 24,
+    elevation: 12,
   },
   headerTitle: {
     flex: 2,
@@ -526,6 +538,16 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 14,
     marginTop: 8,
+  },
+  flatListContainer: {
+    height: vh(48),
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   admob: {
     flex: 1,

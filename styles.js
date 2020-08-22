@@ -7,6 +7,7 @@ const greenColor = "#00b894";
 const blueColor = "#0984e3";
 const purpleColor = "#6c5ce7";
 const lightPinkColor = "#ed89fa";
+const lightYellowColor = "yellow";
 
 export const colors = {
   blackColor: darkMode,
@@ -24,6 +25,7 @@ export const colors = {
   calendarTextDisabledDarkModeColor: "rgba(255, 255, 255, 0.1)",
   calendarThemeBackgroundLightModeColor: "#f5f5f5",
   calendarThemeBackgroundDarkModeColor: "#3d4142",
+  lightYellowColor: lightYellowColor,
 };
 
 export const backgroundColors = [
