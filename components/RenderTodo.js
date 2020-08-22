@@ -1,4 +1,4 @@
-import React from "react";
+import React, { PureComponent } from "react";
 import {
   StyleSheet,
   Text,
@@ -18,18 +18,8 @@ import {
 import { colors } from "../styles";
 import { LIGHT_MODE, CANCEL, EDIT, DELETE, EDIT_OR_DELETE } from "../words";
 
-export default ({
-  todo,
-  index,
-  toggleTodoCompleted,
-  editTodo,
-  deleteTodo,
-  edit,
-  newTodo,
-  editIndex,
-  mode,
-}) => {
-  const todoItemLongPress = (title, index) => {
+class RenderTodo extends PureComponent {
+  todoItemLongPress = (title, index, editTodo, deleteTodo) => {
     Alert.alert(
       EDIT_OR_DELETE,
       "",
@@ -55,7 +45,7 @@ export default ({
     );
   };
 
-  const renderLeftActions = (progress, dragX) => {
+  renderLeftActions = (progress, dragX) => {
     const trans = dragX.interpolate({
       inputRange: [0, 50, 100, 101],
       outputRange: [-20, 0, 0, 1],
@@ -81,7 +71,7 @@ export default ({
     );
   };
 
-  const renderRightActions = (progress) => {
+  renderRightActions = (progress) => {
     const trans = progress.interpolate({
       inputRange: [0, 1],
       outputRange: [300, 0],
@@ -102,58 +92,80 @@ export default ({
     );
   };
 
-  return (
-    <Swipeable
-      renderLeftActions={renderLeftActions}
-      renderRightActions={renderRightActions}
-      onSwipeableLeftOpen={editTodo.bind(this, todo.title, index)}
-      onSwipeableRightOpen={deleteTodo.bind(this, todo.title)}
-    >
-      <View style={styles.todoContainer}>
-        <TouchableOpacity
-          style={{ flexDirection: "row" }}
-          onPress={toggleTodoCompleted.bind(this, index)}
-          onLongPress={
-            Platform.OS === "android" &&
-            todoItemLongPress.bind(this, todo.title, index)
-          }
-        >
-          <MaterialCommunityIcons
-            name={
-              todo.completed
-                ? "checkbox-marked-outline"
-                : "checkbox-blank-outline"
+  render() {
+    const {
+      todo,
+      index,
+      toggleTodoCompleted,
+      editTodo,
+      deleteTodo,
+      edit,
+      newTodo,
+      editIndex,
+      mode,
+    } = this.props;
+
+    return (
+      <Swipeable
+        renderLeftActions={this.renderLeftActions}
+        renderRightActions={this.renderRightActions}
+        onSwipeableLeftOpen={editTodo.bind(this, todo.title, index)}
+        onSwipeableRightOpen={deleteTodo.bind(this, todo.title)}
+      >
+        <View style={styles.todoContainer}>
+          <TouchableOpacity
+            style={{ flexDirection: "row" }}
+            onPress={toggleTodoCompleted.bind(this, index)}
+            onLongPress={
+              Platform.OS === "android" &&
+              this.todoItemLongPress.bind(
+                this,
+                todo.title,
+                index,
+                editTodo,
+                deleteTodo
+              )
             }
-            size={24}
-            color={
-              todo.completed
-                ? colors.grayColor
-                : mode === LIGHT_MODE
-                ? colors.blackColor
-                : colors.whiteColor
-            }
-            style={{ width: 32 }}
-          />
-          <Text
-            style={[
-              styles.todo,
-              {
-                textDecorationLine: todo.completed ? "line-through" : "none",
-                color: todo.completed
+          >
+            <MaterialCommunityIcons
+              name={
+                todo.completed
+                  ? "checkbox-marked-outline"
+                  : "checkbox-blank-outline"
+              }
+              size={24}
+              color={
+                todo.completed
                   ? colors.grayColor
                   : mode === LIGHT_MODE
                   ? colors.blackColor
-                  : colors.whiteColor,
-              },
-            ]}
-          >
-            {edit && index === editIndex ? newTodo : todo.title}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </Swipeable>
-  );
-};
+                  : colors.whiteColor
+              }
+              style={{ width: 32 }}
+            />
+            <Text
+              style={[
+                styles.todo,
+                {
+                  textDecorationLine: todo.completed ? "line-through" : "none",
+                  color: todo.completed
+                    ? colors.grayColor
+                    : mode === LIGHT_MODE
+                    ? colors.blackColor
+                    : colors.whiteColor,
+                },
+              ]}
+            >
+              {edit && index === editIndex ? newTodo : todo.title}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </Swipeable>
+    );
+  }
+}
+
+export default RenderTodo;
 
 const styles = StyleSheet.create({
   todoContainer: {
