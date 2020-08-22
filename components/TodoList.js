@@ -154,11 +154,15 @@ class TodoList extends PureComponent {
                 },
                 {
                   text: EDIT_LIST,
-                  onPress: toggleReviseList(screenList),
+                  onPress: toggleReviseList.bind(this, screenList),
                 },
                 {
                   text: DELETE_LIST,
-                  onPress: this.deleteLongPress(screenList, deleteList),
+                  onPress: this.deleteLongPress.bind(
+                    this,
+                    screenList,
+                    deleteList
+                  ),
                 },
               ],
               /*
