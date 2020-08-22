@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { PureComponent } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, Alert } from "react-native";
 import { Agenda } from "react-native-calendars";
 import { vw, vh, vmin, vmax } from "react-native-expo-viewport-units";
@@ -6,61 +6,96 @@ import { colors } from "../styles";
 import { LIGHT_MODE } from "../words";
 import moment from "moment";
 
-export default ({ route }) => {
-  const [items, setItems] = useState({});
-  const [scheduleItems, setScheduleItems] = useState([]);
-  const [markedDates, setMarkedDates] = useState({});
-  const { mode, screenLists } = route.params;
+let count = 0;
 
-  const lightWhiteTheme =
-    mode === LIGHT_MODE ? colors.whiteColor : colors.blackColor;
-  const lightblackTheme =
-    mode === LIGHT_MODE ? colors.blackColor : colors.whiteColor;
+class Calendar extends PureComponent {
+  state = {
+    items: {},
+    markingItems: {},
+    scheduleItems: [],
+    markedDates: {},
+  };
 
-  const vacation = { color: "#00b894" };
-  const massage = { color: "#0984e3" };
-  const workout = { color: "#6c5ce7" };
+  static getDerivedStateFromProps(props, state) {
+    const {
+      route: {
+        params: { screenLists },
+      },
+    } = props;
 
-  const timeToString = (time) => {
+    try {
+      const tempItems = screenLists.map((screenList) => {
+        return {
+          when: `${moment(screenList.getTime).format("YYYY")}-${moment(
+            screenList.getTime
+          ).format("MM")}-${moment(screenList.getTime).format("DD")}`,
+          name: screenList.name,
+          color: screenList.color,
+        };
+      });
+
+      return {
+        scheduleItems: tempItems,
+      };
+    } catch (error) {
+      console.log("error: ", error);
+    }
+  }
+
+  timeToString = (time) => {
     const date = moment(time).format();
     return date.split("T")[0];
   };
 
-  const markingToDates = () => {
-    setMarkedDates({
-      "2020-08-23": {
-        dots: [{ color: "black" }, { color: "pink" }, { color: "purple" }],
-      },
-      "2020-08-24": { dots: [massage, workout] },
-    });
-  };
-
-  const loadItems = (day) => {
+  loadItems = (items, markingItems, scheduleItems, markedDates, day) => {
     // console.log("day: ", day);
-    // for (let i = 0; i < 85; i++) {
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 85; i++) {
       const time = day.timestamp + i * 24 * 60 * 60 * 1000;
-      const strTime = timeToString(time);
+      const strTime = this.timeToString(time);
       const scheduleTempItems = scheduleItems.filter(
         (scheduleItem) => scheduleItem.when === strTime
       );
       if (!items[strTime]) {
         items[strTime] = [];
+        markingItems[strTime] = [];
+        markedDates[strTime] = [];
         for (let j = 0; j < scheduleTempItems.length; j++) {
           items[strTime].push({
             name: scheduleTempItems[j].name,
             color: scheduleTempItems[j].color,
           });
+          markingItems[strTime].push({ color: scheduleTempItems[j].color });
+        }
+        const markingItemsColors = markingItems[strTime].map((markingItem) => {
+          return { color: markingItem.color };
+        });
+        if (markingItemsColors.length > 0) {
+          markedDates[strTime].push({ dots: markingItemsColors });
         }
       }
     }
     const newItems = {};
+    const markedNewItems = {};
     Object.keys(items).forEach((key) => {
       newItems[key] = items[key];
     });
+    Object.keys(markedDates).forEach((key) => {
+      if (markedDates[key].length > 0) {
+        markedNewItems[key] = markedDates[key][0];
+      }
+    });
+    if (count === 0) {
+      /*
+        처음엔 markedDates가 제대로 들어 가는데,
+        3번 로드돼서, 2번째와 3번째에는 빈 {}가 들어감.
+        그래서 count 처리.
+      */
+      this.setState({ items: newItems, markedDates: markedNewItems });
+      count++;
+    }
   };
 
-  const renderItem = (item) => {
+  renderItem = (item) => {
     return (
       <TouchableOpacity
         style={[
@@ -76,7 +111,7 @@ export default ({ route }) => {
     );
   };
 
-  const renderEmptyDate = (day) => {
+  renderEmptyDate = (day) => {
     const selectedDay = moment(day).format().split("T")[0];
     return (
       <View style={styles.emptyDate}>
@@ -87,66 +122,60 @@ export default ({ route }) => {
     );
   };
 
-  const preLoad = () => {
-    try {
-      const tempItems = screenLists.map((screenList) => {
-        return {
-          when: `${moment(screenList.getTime).format("YYYY")}-${moment(
-            screenList.getTime
-          ).format("MM")}-${moment(screenList.getTime).format("DD")}`,
-          name: screenList.name,
-          color: screenList.color,
-        };
-      });
-      setScheduleItems((scheduleItems) => [...tempItems]);
+  render() {
+    const { items, markingItems, scheduleItems, markedDates } = this.state;
+    const { mode } = this.props.route.params;
+    const lightWhiteTheme =
+      mode === LIGHT_MODE ? colors.whiteColor : colors.blackColor;
+    const lightblackTheme =
+      mode === LIGHT_MODE ? colors.blackColor : colors.whiteColor;
 
-      markingToDates();
-    } catch (error) {
-      console.log("error: ", error);
-    }
-  };
-
-  useEffect(() => {
-    preLoad();
-  }, []);
-
-  return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: lightWhiteTheme,
-      }}
-    >
-      <View style={{ flex: 0.6 }}></View>
-      <View style={{ flex: 12 }}>
-        <Agenda
-          current={moment().format()}
-          minDate={moment().format()}
-          items={items}
-          loadItemsForMonth={loadItems}
-          renderItem={renderItem}
-          renderEmptyDate={renderEmptyDate}
-          markingType={"multi-dot"}
-          markedDates={markedDates}
-          theme={{
-            calendarBackground: lightWhiteTheme,
-            agendaKnobColor: lightblackTheme,
-            monthTextColor: lightblackTheme,
-            dayTextColor: lightblackTheme,
-            textDisabledColor:
-              mode === LIGHT_MODE
-                ? colors.calendarTextDisabledLightModeColor
-                : colors.calendarTextDisabledDarkModeColor,
-            backgroundColor:
-              mode === LIGHT_MODE
-                ? colors.calendarThemeBackgroundLightModeColor
-                : colors.calendarThemeBackgroundDarkModeColor,
-          }}
-        />
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: lightWhiteTheme,
+        }}
+      >
+        <View style={{ flex: 0.6 }}></View>
+        <View style={{ flex: 12 }}>
+          <Agenda
+            current={moment().format()}
+            minDate={moment().format()}
+            items={items}
+            loadItemsForMonth={this.loadItems.bind(
+              this,
+              items,
+              markingItems,
+              scheduleItems,
+              markedDates
+            )}
+            renderItem={this.renderItem}
+            renderEmptyDate={this.renderEmptyDate}
+            markingType={"multi-dot"}
+            markedDates={markedDates}
+            theme={{
+              calendarBackground: lightWhiteTheme,
+              agendaKnobColor: lightblackTheme,
+              monthTextColor: lightblackTheme,
+              dayTextColor: lightblackTheme,
+              textDisabledColor:
+                mode === LIGHT_MODE
+                  ? colors.calendarTextDisabledLightModeColor
+                  : colors.calendarTextDisabledDarkModeColor,
+              backgroundColor:
+                mode === LIGHT_MODE
+                  ? colors.calendarThemeBackgroundLightModeColor
+                  : colors.calendarThemeBackgroundDarkModeColor,
+            }}
+          />
+        </View>
       </View>
-    </View>
-  );
-};
+    );
+  }
+}
+
+export default Calendar;
 
 const styles = StyleSheet.create({
   calendar: {},
