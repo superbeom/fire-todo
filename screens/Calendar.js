@@ -6,12 +6,22 @@ import {
   TouchableOpacity,
   Alert,
   Modal,
+  Platform,
 } from "react-native";
 import { Agenda } from "react-native-calendars";
 import { vw, vh, vmin, vmax } from "react-native-expo-viewport-units";
+import AntDesign from "react-native-vector-icons/AntDesign";
 import TodoModal from "../components/TodoModal";
 import { colors } from "../styles";
-import { LIGHT_MODE } from "../words";
+import {
+  CANCEL,
+  DELETE,
+  EDIT_LIST,
+  DELETE_LIST,
+  WHAT_WANT,
+  SERIOUSLY_DELETE_LIST,
+  LIGHT_MODE,
+} from "../words";
 import moment from "moment";
 
 class Calendar extends PureComponent {
@@ -26,11 +36,7 @@ class Calendar extends PureComponent {
   };
 
   static getDerivedStateFromProps(props, state) {
-    const {
-      route: {
-        params: { screenLists },
-      },
-    } = props;
+    const { screenLists } = props;
 
     try {
       const tempItems = screenLists.map((screenList) => {
@@ -50,6 +56,29 @@ class Calendar extends PureComponent {
       console.log("error: ", error);
     }
   }
+
+  deleteLongPress = (screenList, deleteList) => {
+    console.log("screenList: ", screenList);
+    Alert.alert(
+      SERIOUSLY_DELETE_LIST,
+      "",
+      [
+        {
+          text: CANCEL,
+          onPress: () => null,
+        },
+        {
+          text: DELETE,
+          onPress: deleteList.bind(this, screenList),
+        },
+      ],
+      /*
+        Alert 띄웠을 때 - 뒤로가기 버튼으로 Alert를 끄려면,
+        4번째 parameter에 { cancelable: true } 설정
+      */
+      { cancelable: true }
+    );
+  };
 
   setShowListVisible = (visible, targetScreenList, targetRemainingDay) => {
     this.setState({
@@ -114,7 +143,14 @@ class Calendar extends PureComponent {
     }
   };
 
-  renderItem = (showListVisible, screenLists, item) => {
+  renderItem = (
+    showListVisible,
+    screenLists,
+    toggleReviseList,
+    screenList,
+    deleteList,
+    item
+  ) => {
     const targetScreenList = screenLists.filter(
       (screenList) => screenList.name === item.name
     )[0];
@@ -148,12 +184,24 @@ class Calendar extends PureComponent {
         )}
         onLongPress={() => {
           Alert.alert(
-            "WHAT_WANT",
+            WHAT_WANT,
             "",
             [
               {
-                text: "CANCEL",
+                text: CANCEL,
                 onPress: () => null,
+              },
+              {
+                text: EDIT_LIST,
+                onPress: toggleReviseList.bind(this, targetScreenList),
+              },
+              {
+                text: DELETE_LIST,
+                onPress: this.deleteLongPress.bind(
+                  this,
+                  targetScreenList,
+                  deleteList
+                ),
               },
             ],
             /*
@@ -180,7 +228,7 @@ class Calendar extends PureComponent {
             return null;
           }}
         >
-          <Text style={styles.emptyDateText}>+</Text>
+          <AntDesign name="plus" color={colors.whiteColor} size={vw(4)} />
         </TouchableOpacity>
       </View>
     );
@@ -196,13 +244,18 @@ class Calendar extends PureComponent {
       screenList,
       remainingDay,
     } = this.state;
-    const { mode, screenLists, updateList } = this.props.route.params;
+    const {
+      mode,
+      screenLists,
+      updateList,
+      deleteList,
+      toggleCalendarModal,
+      toggleReviseList,
+    } = this.props;
     const lightWhiteTheme =
       mode === LIGHT_MODE ? colors.whiteColor : colors.blackColor;
     const lightblackTheme =
       mode === LIGHT_MODE ? colors.blackColor : colors.whiteColor;
-
-    console.log("Calendar");
 
     return (
       <View
@@ -229,7 +282,37 @@ class Calendar extends PureComponent {
             mode={mode}
           />
         </Modal>
-        <View style={{ flex: 0.6 }}></View>
+        {Platform.OS === "android" && <View style={{ flex: 0.6 }}></View>}
+        {Platform.OS === "ios" && (
+          <>
+            <View style={{ flex: 0.6 }}></View>
+            <View
+              style={{
+                flex: 0.8,
+                justifyContent: "center",
+                backgroundColor: lightWhiteTheme,
+                zIndex: 5,
+              }}
+            >
+              <TouchableOpacity
+                style={[
+                  styles.backButton,
+                  {
+                    backgroundColor: lightblackTheme,
+                    shadowColor: lightblackTheme,
+                  },
+                ]}
+                onPress={toggleCalendarModal}
+              >
+                <AntDesign
+                  name="arrowleft"
+                  color={lightWhiteTheme}
+                  size={vw(7)}
+                />
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
         <View style={{ flex: 12 }}>
           <Agenda
             current={moment().format()}
@@ -245,7 +328,10 @@ class Calendar extends PureComponent {
             renderItem={this.renderItem.bind(
               this,
               showListVisible,
-              screenLists
+              screenLists,
+              toggleReviseList,
+              screenList,
+              deleteList
             )}
             renderEmptyDate={this.renderEmptyDate}
             markingType={"multi-dot"}
@@ -294,18 +380,29 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     height: 15,
     paddingTop: 30,
-    paddingHorizontal: 50,
+    paddingHorizontal: 30,
   },
   emptyDateButton: {
     width: vw(8),
     height: vw(8),
-    backgroundColor: "rgba(39, 177, 246, 0.6)",
-    borderRadius: 50,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "rgba(39, 177, 246, 0.6)",
+    borderRadius: 50,
   },
-  emptyDateText: {
-    color: colors.whiteColor,
-    fontSize: 16,
+  backButton: {
+    width: vh(6),
+    height: vh(6),
+    justifyContent: "center",
+    alignItems: "center",
+    left: 15,
+    borderRadius: 50,
+    shadowOffset: {
+      width: 2,
+      height: 6,
+    },
+    shadowOpacity: 0.37,
+    shadowRadius: 7.49,
+    elevation: 12,
   },
 });

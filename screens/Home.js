@@ -21,6 +21,7 @@ import AddListModal from "../components/AddListModal";
 import { randomKeyOne } from "../key";
 import moment from "moment";
 import { AdMobBanner } from "expo-ads-admob";
+import Calendar from "./Calendar";
 
 let COUNT = 0;
 let CHECK_INDEX = 0;
@@ -41,10 +42,15 @@ export default React.memo(({ navigation, route }) => {
   const [goalDate, setGoalDate] = useState(null);
   const [getTime, setGetTime] = useState(null);
   const [mode, setMode] = useState(null);
+  const [showCalendar, setShowCalendar] = useState(false);
 
   // BackHandler.addEventListener("hardwareBackPress", () => {
   //   BackHandler.exitApp();
   // });
+
+  const toggleCalendarModal = () => {
+    setShowCalendar(!showCalendar);
+  };
 
   const toggleMode = async () => {
     setMode(mode === LIGHT_MODE ? DARK_MODE : LIGHT_MODE);
@@ -327,13 +333,14 @@ export default React.memo(({ navigation, route }) => {
             right: 10,
             zIndex: 5,
           }}
-          onPress={() =>
-            navigation.navigate("Calendar", {
-              mode,
-              screenLists,
-              updateList,
-            })
-          }
+          // onPress={() =>
+          //   navigation.navigate("Calendar", {
+          //     mode,
+          //     screenLists,
+          //     updateList,
+          //   })
+          // }
+          onPress={() => setShowCalendar(true)}
         >
           <Image
             style={{
@@ -423,6 +430,21 @@ export default React.memo(({ navigation, route }) => {
             now={now}
             selectDate={selectDate}
             mode={mode}
+          />
+        </Modal>
+
+        <Modal
+          animationType="slide"
+          visible={showCalendar}
+          onRequestClose={toggleCalendarModal}
+        >
+          <Calendar
+            mode={mode}
+            screenLists={screenLists}
+            updateList={updateList}
+            deleteList={deleteList}
+            toggleCalendarModal={toggleCalendarModal}
+            toggleReviseList={toggleReviseList}
           />
         </Modal>
 
