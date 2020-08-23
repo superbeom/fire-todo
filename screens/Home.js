@@ -10,7 +10,6 @@ import {
   Image,
   StatusBar,
   BackHandler,
-  Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-community/async-storage";
 import { AntDesign } from "@expo/vector-icons";
@@ -273,15 +272,8 @@ export default React.memo(() => {
     preLoad();
 
     const backAction = () => {
-      Alert.alert("Hold on!", "Are you sure you want to go back?", [
-        {
-          text: "Cancel",
-          onPress: () => null,
-          style: "cancel",
-        },
-        { text: "YES", onPress: () => BackHandler.exitApp() },
-      ]);
-      return false;
+      BackHandler.exitApp();
+      return true;
     };
 
     const backHandler = BackHandler.addEventListener(
@@ -491,8 +483,7 @@ export default React.memo(() => {
       <View style={styles.admob}>
         <AdMobBanner
           bannerSize="banner"
-          // adUnitID="ca-app-pub-4979785113165927/8289125429" // This is my ID
-          adUnitID="ca-app-pub-3940256099942544/6300978111" // This is test ID
+          adUnitID="ca-app-pub-4979785113165927/8289125429" // This is my ID
           servePersonalizedAds={true}
           onDidFailToReceiveAdWithError={this.bannerError}
         />
