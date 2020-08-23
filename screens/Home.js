@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-community/async-storage";
 import { AntDesign } from "@expo/vector-icons";
-import { vw, vh, vmin, vmax } from "react-native-expo-viewport-units";
+import { vw, vh, vmax } from "react-native-expo-viewport-units";
 import { colors } from "../styles";
 import { APP_NAME, ADD_LIST, LIGHT_MODE, DARK_MODE } from "../words";
 import TodoList from "../components/TodoList";
@@ -25,8 +25,9 @@ import Calendar from "./Calendar";
 
 let COUNT = 0;
 let CHECK_INDEX = 0;
+let BACK_BUTTON_PRESS_COUNT = 0;
 
-export default React.memo(({ navigation, route }) => {
+export default React.memo(() => {
   const newDate = new Date();
   const [addTodoVisible, setAddTodoVisible] = useState(false);
   const [screenLists, setScreenLists] = useState([]);
@@ -43,10 +44,6 @@ export default React.memo(({ navigation, route }) => {
   const [getTime, setGetTime] = useState(null);
   const [mode, setMode] = useState(null);
   const [showCalendar, setShowCalendar] = useState(false);
-
-  // BackHandler.addEventListener("hardwareBackPress", () => {
-  //   BackHandler.exitApp();
-  // });
 
   const toggleCalendarModal = () => {
     setShowCalendar(!showCalendar);
@@ -235,7 +232,6 @@ export default React.memo(({ navigation, route }) => {
 
   const preLoad = async () => {
     try {
-      // await AsyncStorage.clear();
       const storageCount = await AsyncStorage.getItem("count");
       const storageMode = await AsyncStorage.getItem("mode");
 
@@ -275,6 +271,18 @@ export default React.memo(({ navigation, route }) => {
 
   useEffect(() => {
     preLoad();
+
+    const backAction = () => {
+      BackHandler.exitApp();
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
   }, []);
 
   return loading ? (
@@ -434,9 +442,7 @@ export default React.memo(({ navigation, route }) => {
             mode={mode}
             screenLists={screenLists}
             updateList={updateList}
-            deleteList={deleteList}
             toggleCalendarModal={toggleCalendarModal}
-            toggleReviseList={toggleReviseList}
           />
         </Modal>
 
@@ -476,13 +482,13 @@ export default React.memo(({ navigation, route }) => {
         </View>
       </View>
       <View style={styles.admob}>
-        {/* <AdMobBanner
+        <AdMobBanner
           bannerSize="banner"
           // adUnitID="ca-app-pub-4979785113165927/8289125429" // This is my ID
           adUnitID="ca-app-pub-3940256099942544/6300978111" // This is test ID
           servePersonalizedAds={true}
           onDidFailToReceiveAdWithError={this.bannerError}
-        /> */}
+        />
       </View>
     </View>
   );

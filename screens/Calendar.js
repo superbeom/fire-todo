@@ -4,24 +4,15 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Alert,
   Modal,
   Platform,
 } from "react-native";
 import { Agenda } from "react-native-calendars";
-import { vw, vh, vmin, vmax } from "react-native-expo-viewport-units";
+import { vw, vh } from "react-native-expo-viewport-units";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import TodoModal from "../components/TodoModal";
 import { colors } from "../styles";
-import {
-  CANCEL,
-  DELETE,
-  EDIT_LIST,
-  DELETE_LIST,
-  WHAT_WANT,
-  SERIOUSLY_DELETE_LIST,
-  LIGHT_MODE,
-} from "../words";
+import { LIGHT_MODE } from "../words";
 import moment from "moment";
 
 class Calendar extends PureComponent {
@@ -56,29 +47,6 @@ class Calendar extends PureComponent {
       console.log("error: ", error);
     }
   }
-
-  deleteLongPress = (screenList, deleteList) => {
-    console.log("screenList: ", screenList);
-    Alert.alert(
-      SERIOUSLY_DELETE_LIST,
-      "",
-      [
-        {
-          text: CANCEL,
-          onPress: () => null,
-        },
-        {
-          text: DELETE,
-          onPress: deleteList.bind(this, screenList),
-        },
-      ],
-      /*
-        Alert 띄웠을 때 - 뒤로가기 버튼으로 Alert를 끄려면,
-        4번째 parameter에 { cancelable: true } 설정
-      */
-      { cancelable: true }
-    );
-  };
 
   setShowListVisible = (visible, targetScreenList, targetRemainingDay) => {
     this.setState({
@@ -137,101 +105,49 @@ class Calendar extends PureComponent {
         markedNewItems[key] = markedDates[key][0];
       }
     });
-
     if (Object.keys(markedNewItems).length > 0) {
       this.setState({ items: newItems, markedDates: markedNewItems });
     }
   };
 
-  renderItem = (
-    showListVisible,
-    screenLists,
-    toggleReviseList,
-    screenList,
-    deleteList,
-    item
-  ) => {
+  renderItem = (showListVisible, screenLists, item) => {
     const targetScreenList = screenLists.filter(
       (screenList) => screenList.name === item.name
     )[0];
-    const originDate = moment(new Date()).format();
-    const splitDate = originDate.split("-");
-    const startDate = moment(
-      `${parseInt(splitDate[0])}.${parseInt(splitDate[1])}.${parseInt(
-        splitDate[2].substring(0, 2)
-      )}`,
-      "YYYY.MM.DD"
-    );
-    const endDate = moment(
-      `${targetScreenList.year}.${targetScreenList.month}.${targetScreenList.date}`,
-      "YYYY.MM.DD"
-    );
-    const targetRemainingDay = endDate.diff(startDate, "days");
+    if (targetScreenList !== undefined) {
+      const originDate = moment(new Date()).format();
+      const splitDate = originDate.split("-");
+      const startDate = moment(
+        `${parseInt(splitDate[0])}.${parseInt(splitDate[1])}.${parseInt(
+          splitDate[2].substring(0, 2)
+        )}`,
+        "YYYY.MM.DD"
+      );
+      const endDate = moment(
+        `${targetScreenList.year}.${targetScreenList.month}.${targetScreenList.date}`,
+        "YYYY.MM.DD"
+      );
+      const targetRemainingDay = endDate.diff(startDate, "days");
 
-    return (
-      <TouchableOpacity
-        style={[
-          styles.item,
-          {
-            backgroundColor: item.color,
-          },
-        ]}
-        onPress={this.toggleListModal.bind(
-          this,
-          showListVisible,
-          targetScreenList,
-          targetRemainingDay
-        )}
-        onLongPress={() => {
-          Alert.alert(
-            WHAT_WANT,
-            "",
-            [
-              {
-                text: CANCEL,
-                onPress: () => null,
-              },
-              {
-                text: EDIT_LIST,
-                onPress: toggleReviseList.bind(this, targetScreenList),
-              },
-              {
-                text: DELETE_LIST,
-                onPress: this.deleteLongPress.bind(
-                  this,
-                  targetScreenList,
-                  deleteList
-                ),
-              },
-            ],
-            /*
-              Alert 띄웠을 때 - 뒤로가기 버튼으로 Alert를 끄려면,
-              4번째 parameter에 { cancelable: true } 설정
-            */
-            { cancelable: true }
-          );
-        }}
-      >
-        <Text style={styles.itemText}>{item.name}</Text>
-      </TouchableOpacity>
-    );
-  };
-
-  renderEmptyDate = (day) => {
-    // const selectedDay = day.split("T")[0];
-    return (
-      <View style={styles.emptyDate}>
+      return (
         <TouchableOpacity
-          style={styles.emptyDateButton}
-          onPress={() => {
-            // console.log("day: ", day, typeof day);
-            return null;
-          }}
+          style={[
+            styles.item,
+            {
+              backgroundColor: item.color,
+            },
+          ]}
+          onPress={this.toggleListModal.bind(
+            this,
+            showListVisible,
+            targetScreenList,
+            targetRemainingDay
+          )}
         >
-          <AntDesign name="plus" color={colors.whiteColor} size={vw(4)} />
+          <Text style={styles.itemText}>{item.name}</Text>
         </TouchableOpacity>
-      </View>
-    );
+      );
+    }
   };
 
   render() {
@@ -244,14 +160,7 @@ class Calendar extends PureComponent {
       screenList,
       remainingDay,
     } = this.state;
-    const {
-      mode,
-      screenLists,
-      updateList,
-      deleteList,
-      toggleCalendarModal,
-      toggleReviseList,
-    } = this.props;
+    const { mode, screenLists, updateList, toggleCalendarModal } = this.props;
     const lightWhiteTheme =
       mode === LIGHT_MODE ? colors.whiteColor : colors.blackColor;
     const lightblackTheme =
@@ -328,14 +237,11 @@ class Calendar extends PureComponent {
             renderItem={this.renderItem.bind(
               this,
               showListVisible,
-              screenLists,
-              toggleReviseList,
-              screenList,
-              deleteList
+              screenLists
             )}
-            renderEmptyDate={this.renderEmptyDate}
             markingType={"multi-dot"}
             markedDates={markedDates}
+            pastScrollRange={1}
             theme={{
               calendarBackground: lightWhiteTheme,
               agendaKnobColor: lightblackTheme,
