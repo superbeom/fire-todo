@@ -11,6 +11,7 @@ import {
 import { Agenda } from "react-native-calendars";
 import { vw, vh, vmin, vmax } from "react-native-expo-viewport-units";
 import AntDesign from "react-native-vector-icons/AntDesign";
+import AddListModal from "../components/AddListModal";
 import TodoModal from "../components/TodoModal";
 import { colors } from "../styles";
 import {
@@ -33,10 +34,15 @@ class Calendar extends PureComponent {
     showListVisible: false,
     screenList: {},
     remainingDay: 0,
+    clickDate: null,
   };
 
   static getDerivedStateFromProps(props, state) {
     const { screenLists } = props;
+    const { items, markingItems, markedDates } = state;
+    const timeStamp = new Date().getTime();
+
+    console.log("getDerivedStateFromProps");
 
     try {
       const tempItems = screenLists.map((screenList) => {
@@ -49,6 +55,57 @@ class Calendar extends PureComponent {
         };
       });
 
+      const timeToString = (time) => {
+        const date = moment(time).format();
+        return date.split("T")[0];
+      };
+
+      for (let i = 0; i < 85; i++) {
+        const time = timeStamp + i * 24 * 60 * 60 * 1000;
+        const strTime = timeToString(time);
+        const scheduleTempItems = tempItems.filter(
+          (scheduleItem) => scheduleItem.when === strTime
+        );
+        if (!items[strTime]) {
+          items[strTime] = [];
+          markingItems[strTime] = [];
+          markedDates[strTime] = [];
+          for (let j = 0; j < scheduleTempItems.length; j++) {
+            items[strTime].push({
+              name: scheduleTempItems[j].name,
+              color: scheduleTempItems[j].color,
+            });
+            markingItems[strTime].push({ color: scheduleTempItems[j].color });
+          }
+          const markingItemsColors = markingItems[strTime].map(
+            (markingItem) => {
+              return { color: markingItem.color };
+            }
+          );
+          if (markingItemsColors.length > 0) {
+            markedDates[strTime].push({ dots: markingItemsColors });
+          }
+        }
+      }
+      const newItems = {};
+      const markedNewItems = {};
+      Object.keys(items).forEach((key) => {
+        newItems[key] = items[key];
+      });
+      Object.keys(markedDates).forEach((key) => {
+        if (markedDates[key].length > 0) {
+          markedNewItems[key] = markedDates[key][0];
+        }
+      });
+
+      if (Object.keys(markedNewItems).length > 0) {
+        return {
+          scheduleItems: tempItems,
+          items: newItems,
+          markedDates: markedNewItems,
+        };
+      }
+
       return {
         scheduleItems: tempItems,
       };
@@ -57,8 +114,14 @@ class Calendar extends PureComponent {
     }
   }
 
+  dayPress = (changeNow, day) => {
+    const pressDate = moment(day.timestamp).format().split("T")[0];
+    const newNow = new Date(pressDate);
+    this.setState({ clickDate: newNow });
+    changeNow(newNow);
+  };
+
   deleteLongPress = (screenList, deleteList) => {
-    console.log("screenList: ", screenList);
     Alert.alert(
       SERIOUSLY_DELETE_LIST,
       "",
@@ -72,10 +135,32 @@ class Calendar extends PureComponent {
           onPress: deleteList.bind(this, screenList),
         },
       ],
-      /*
-        Alert 띄웠을 때 - 뒤로가기 버튼으로 Alert를 끄려면,
-        4번째 parameter에 { cancelable: true } 설정
-      */
+      { cancelable: true }
+    );
+  };
+
+  renderItemlongPress = (targetScreenList, toggleReviseList, deleteList) => {
+    Alert.alert(
+      WHAT_WANT,
+      "",
+      [
+        {
+          text: CANCEL,
+          onPress: () => null,
+        },
+        {
+          text: EDIT_LIST,
+          onPress: toggleReviseList.bind(this, targetScreenList),
+        },
+        {
+          text: DELETE_LIST,
+          onPress: this.deleteLongPress.bind(
+            this,
+            targetScreenList,
+            deleteList
+          ),
+        },
+      ],
       { cancelable: true }
     );
   };
@@ -96,142 +181,104 @@ class Calendar extends PureComponent {
     );
   };
 
-  timeToString = (time) => {
-    const date = moment(time).format();
-    return date.split("T")[0];
-  };
+  // timeToString = (time) => {
+  //   const date = moment(time).format();
+  //   return date.split("T")[0];
+  // };
 
-  loadItems = (items, markingItems, scheduleItems, markedDates, day) => {
-    for (let i = 0; i < 85; i++) {
-      const time = day.timestamp + i * 24 * 60 * 60 * 1000;
-      const strTime = this.timeToString(time);
-      const scheduleTempItems = scheduleItems.filter(
-        (scheduleItem) => scheduleItem.when === strTime
-      );
-      if (!items[strTime]) {
-        items[strTime] = [];
-        markingItems[strTime] = [];
-        markedDates[strTime] = [];
-        for (let j = 0; j < scheduleTempItems.length; j++) {
-          items[strTime].push({
-            name: scheduleTempItems[j].name,
-            color: scheduleTempItems[j].color,
-          });
-          markingItems[strTime].push({ color: scheduleTempItems[j].color });
-        }
-        const markingItemsColors = markingItems[strTime].map((markingItem) => {
-          return { color: markingItem.color };
-        });
-        if (markingItemsColors.length > 0) {
-          markedDates[strTime].push({ dots: markingItemsColors });
-        }
-      }
-    }
-    const newItems = {};
-    const markedNewItems = {};
-    Object.keys(items).forEach((key) => {
-      newItems[key] = items[key];
-    });
-    Object.keys(markedDates).forEach((key) => {
-      if (markedDates[key].length > 0) {
-        markedNewItems[key] = markedDates[key][0];
-      }
-    });
-
-    if (Object.keys(markedNewItems).length > 0) {
-      this.setState({ items: newItems, markedDates: markedNewItems });
-    }
+  // loadItems = (items, markingItems, scheduleItems, markedDates, day) => {
+  loadItems = (day) => {
+    console.log("loadItems");
+    // for (let i = 0; i < 85; i++) {
+    //   const time = day.timestamp + i * 24 * 60 * 60 * 1000;
+    //   const strTime = this.timeToString(time);
+    //   const scheduleTempItems = scheduleItems.filter(
+    //     (scheduleItem) => scheduleItem.when === strTime
+    //   );
+    //   if (!items[strTime]) {
+    //     items[strTime] = [];
+    //     markingItems[strTime] = [];
+    //     markedDates[strTime] = [];
+    //     for (let j = 0; j < scheduleTempItems.length; j++) {
+    //       items[strTime].push({
+    //         name: scheduleTempItems[j].name,
+    //         color: scheduleTempItems[j].color,
+    //       });
+    //       markingItems[strTime].push({ color: scheduleTempItems[j].color });
+    //     }
+    //     const markingItemsColors = markingItems[strTime].map((markingItem) => {
+    //       return { color: markingItem.color };
+    //     });
+    //     if (markingItemsColors.length > 0) {
+    //       markedDates[strTime].push({ dots: markingItemsColors });
+    //     }
+    //   }
+    // }
+    // const newItems = {};
+    // const markedNewItems = {};
+    // Object.keys(items).forEach((key) => {
+    //   newItems[key] = items[key];
+    // });
+    // Object.keys(markedDates).forEach((key) => {
+    //   if (markedDates[key].length > 0) {
+    //     markedNewItems[key] = markedDates[key][0];
+    //   }
+    // });
+    // if (Object.keys(markedNewItems).length > 0) {
+    //   this.setState({ items: newItems, markedDates: markedNewItems });
+    // }
   };
 
   renderItem = (
     showListVisible,
     screenLists,
     toggleReviseList,
-    screenList,
     deleteList,
     item
   ) => {
     const targetScreenList = screenLists.filter(
       (screenList) => screenList.name === item.name
     )[0];
-    const originDate = moment(new Date()).format();
-    const splitDate = originDate.split("-");
-    const startDate = moment(
-      `${parseInt(splitDate[0])}.${parseInt(splitDate[1])}.${parseInt(
-        splitDate[2].substring(0, 2)
-      )}`,
-      "YYYY.MM.DD"
-    );
-    const endDate = moment(
-      `${targetScreenList.year}.${targetScreenList.month}.${targetScreenList.date}`,
-      "YYYY.MM.DD"
-    );
-    const targetRemainingDay = endDate.diff(startDate, "days");
+    if (targetScreenList !== undefined) {
+      const originDate = moment(new Date()).format();
+      const splitDate = originDate.split("-");
+      const startDate = moment(
+        `${parseInt(splitDate[0])}.${parseInt(splitDate[1])}.${parseInt(
+          splitDate[2].substring(0, 2)
+        )}`,
+        "YYYY.MM.DD"
+      );
+      const endDate = moment(
+        `${targetScreenList.year}.${targetScreenList.month}.${targetScreenList.date}`,
+        "YYYY.MM.DD"
+      );
+      const targetRemainingDay = endDate.diff(startDate, "days");
 
-    return (
-      <TouchableOpacity
-        style={[
-          styles.item,
-          {
-            backgroundColor: item.color,
-          },
-        ]}
-        onPress={this.toggleListModal.bind(
-          this,
-          showListVisible,
-          targetScreenList,
-          targetRemainingDay
-        )}
-        onLongPress={() => {
-          Alert.alert(
-            WHAT_WANT,
-            "",
-            [
-              {
-                text: CANCEL,
-                onPress: () => null,
-              },
-              {
-                text: EDIT_LIST,
-                onPress: toggleReviseList.bind(this, targetScreenList),
-              },
-              {
-                text: DELETE_LIST,
-                onPress: this.deleteLongPress.bind(
-                  this,
-                  targetScreenList,
-                  deleteList
-                ),
-              },
-            ],
-            /*
-              Alert 띄웠을 때 - 뒤로가기 버튼으로 Alert를 끄려면,
-              4번째 parameter에 { cancelable: true } 설정
-            */
-            { cancelable: true }
-          );
-        }}
-      >
-        <Text style={styles.itemText}>{item.name}</Text>
-      </TouchableOpacity>
-    );
-  };
-
-  renderEmptyDate = (day) => {
-    // const selectedDay = day.split("T")[0];
-    return (
-      <View style={styles.emptyDate}>
+      return (
         <TouchableOpacity
-          style={styles.emptyDateButton}
-          onPress={() => {
-            // console.log("day: ", day, typeof day);
-            return null;
-          }}
+          style={[
+            styles.item,
+            {
+              backgroundColor: item.color,
+            },
+          ]}
+          onPress={this.toggleListModal.bind(
+            this,
+            showListVisible,
+            targetScreenList,
+            targetRemainingDay
+          )}
+          onLongPress={this.renderItemlongPress.bind(
+            this,
+            targetScreenList,
+            toggleReviseList,
+            deleteList
+          )}
         >
-          <AntDesign name="plus" color={colors.whiteColor} size={vw(4)} />
+          <Text style={styles.itemText}>{item.name}</Text>
         </TouchableOpacity>
-      </View>
-    );
+      );
+    }
   };
 
   render() {
@@ -243,6 +290,7 @@ class Calendar extends PureComponent {
       showListVisible,
       screenList,
       remainingDay,
+      clickDate,
     } = this.state;
     const {
       mode,
@@ -251,6 +299,17 @@ class Calendar extends PureComponent {
       deleteList,
       toggleCalendarModal,
       toggleReviseList,
+      addTodoVisible,
+      toggleAddTodoModal,
+      addList,
+      revise,
+      closeReviseModal,
+      reviseList,
+      reviseScreenList,
+      nowOnChange,
+      now,
+      changeNow,
+      selectDate,
     } = this.props;
     const lightWhiteTheme =
       mode === LIGHT_MODE ? colors.whiteColor : colors.blackColor;
@@ -279,6 +338,25 @@ class Calendar extends PureComponent {
             closeModal={this.toggleListModal.bind(this, showListVisible, [], 0)}
             updateList={updateList}
             remainingDay={remainingDay}
+            mode={mode}
+          />
+        </Modal>
+        <Modal
+          animationType="slide"
+          visible={addTodoVisible}
+          onRequestClose={toggleAddTodoModal}
+        >
+          <AddListModal
+            closeModal={toggleAddTodoModal}
+            addList={addList}
+            screenLists={screenLists}
+            revise={revise}
+            closeReviseModal={closeReviseModal}
+            reviseList={reviseList}
+            reviseScreenList={reviseScreenList}
+            nowOnChange={nowOnChange}
+            now={clickDate || now}
+            selectDate={selectDate}
             mode={mode}
           />
         </Modal>
@@ -318,24 +396,25 @@ class Calendar extends PureComponent {
             current={moment().format()}
             minDate={moment().format()}
             items={items}
-            loadItemsForMonth={this.loadItems.bind(
-              this,
-              items,
-              markingItems,
-              scheduleItems,
-              markedDates
-            )}
+            // loadItemsForMonth={this.loadItems.bind(
+            //   this,
+            //   items,
+            //   markingItems,
+            //   scheduleItems,
+            //   markedDates
+            // )}
+            loadItemsForMonth={this.loadItems}
             renderItem={this.renderItem.bind(
               this,
               showListVisible,
               screenLists,
               toggleReviseList,
-              screenList,
               deleteList
             )}
-            renderEmptyDate={this.renderEmptyDate}
+            onDayPress={this.dayPress.bind(this, changeNow)}
             markingType={"multi-dot"}
             markedDates={markedDates}
+            pastScrollRange={1}
             theme={{
               calendarBackground: lightWhiteTheme,
               agendaKnobColor: lightblackTheme,
@@ -351,6 +430,18 @@ class Calendar extends PureComponent {
                   : colors.calendarThemeBackgroundDarkModeColor,
             }}
           />
+          <TouchableOpacity
+            style={[
+              styles.addButton,
+              {
+                backgroundColor: lightblackTheme,
+                shadowColor: lightblackTheme,
+              },
+            ]}
+            onPress={toggleAddTodoModal}
+          >
+            <AntDesign name="plus" color={lightWhiteTheme} size={vw(7)} />
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -404,5 +495,23 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.37,
     shadowRadius: 7.49,
     elevation: 12,
+  },
+  addButton: {
+    position: "absolute",
+    width: vh(6),
+    height: vh(6),
+    justifyContent: "center",
+    alignItems: "center",
+    bottom: 50,
+    right: 30,
+    borderRadius: 50,
+    shadowOffset: {
+      width: 2,
+      height: 6,
+    },
+    shadowOpacity: 0.37,
+    shadowRadius: 7.49,
+    elevation: 12,
+    zIndex: 5,
   },
 });

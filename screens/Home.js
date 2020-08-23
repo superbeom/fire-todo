@@ -48,6 +48,10 @@ export default React.memo(({ navigation, route }) => {
   //   BackHandler.exitApp();
   // });
 
+  const changeNow = (newNow) => {
+    setNow(newNow);
+  };
+
   const toggleCalendarModal = () => {
     setShowCalendar(!showCalendar);
   };
@@ -437,6 +441,17 @@ export default React.memo(({ navigation, route }) => {
             deleteList={deleteList}
             toggleCalendarModal={toggleCalendarModal}
             toggleReviseList={toggleReviseList}
+            addTodoVisible={addTodoVisible}
+            toggleAddTodoModal={toggleAddTodoModal}
+            addList={addList}
+            revise={revise}
+            closeReviseModal={closeReviseModal}
+            reviseList={reviseList}
+            reviseScreenList={reviseScreenList}
+            nowOnChange={nowOnChange}
+            now={now}
+            changeNow={changeNow}
+            selectDate={selectDate}
           />
         </Modal>
 
