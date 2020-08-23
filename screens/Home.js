@@ -10,6 +10,7 @@ import {
   Image,
   StatusBar,
   BackHandler,
+  Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-community/async-storage";
 import { AntDesign } from "@expo/vector-icons";
@@ -25,7 +26,6 @@ import Calendar from "./Calendar";
 
 let COUNT = 0;
 let CHECK_INDEX = 0;
-let BACK_BUTTON_PRESS_COUNT = 0;
 
 export default React.memo(() => {
   const newDate = new Date();
@@ -281,7 +281,7 @@ export default React.memo(() => {
         },
         { text: "YES", onPress: () => BackHandler.exitApp() },
       ]);
-      return true;
+      return false;
     };
 
     const backHandler = BackHandler.addEventListener(
