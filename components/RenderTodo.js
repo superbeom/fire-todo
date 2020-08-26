@@ -174,6 +174,7 @@ class RenderTodo extends PureComponent {
                     : mode === LIGHT_MODE
                     ? colors.blackColor
                     : colors.whiteColor,
+                  flexShrink: 1,
                 },
               ]}
             >
