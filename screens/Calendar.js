@@ -35,12 +35,14 @@ class Calendar extends PureComponent {
     screenList: {},
     remainingDay: 0,
     clickDate: null,
+    selectTimestamp: null,
+    testItems: [],
   };
 
   static getDerivedStateFromProps(props, state) {
     const { screenLists } = props;
-    const { items, markingItems, markedDates } = state;
-    const timeStamp = new Date().getTime();
+    const { items, markingItems, markedDates, selectTimestamp } = state;
+    const timeStamp = selectTimestamp || new Date().getTime();
 
     console.log("getDerivedStateFromProps");
 
@@ -60,7 +62,7 @@ class Calendar extends PureComponent {
         return date.split("T")[0];
       };
 
-      for (let i = 0; i < 85; i++) {
+      for (let i = 0; i < 14; i++) {
         const time = timeStamp + i * 24 * 60 * 60 * 1000;
         const strTime = timeToString(time);
         const scheduleTempItems = tempItems.filter(
@@ -98,27 +100,38 @@ class Calendar extends PureComponent {
         }
       });
 
+      console.log("newItems: ", newItems);
+
       if (Object.keys(markedNewItems).length > 0) {
+        console.log("testing");
         return {
           scheduleItems: tempItems,
           items: newItems,
           markedDates: markedNewItems,
+          testItems: screenLists,
         };
+      } else {
+        /* 1. 아무 것도 없을 때 // 2. 삭제했을 때 동작 코드 */
+        console.log("else");
       }
 
       return {
         scheduleItems: tempItems,
+        testItems: screenLists,
       };
     } catch (error) {
       console.log("error: ", error);
     }
   }
 
-  dayPress = (changeNow, day) => {
+  dayPress = (setNow, day) => {
     const pressDate = moment(day.timestamp).format().split("T")[0];
     const newNow = new Date(pressDate);
-    this.setState({ clickDate: newNow });
-    changeNow(newNow);
+    setNow(newNow);
+    this.setState({
+      selectTimestamp: day.timestamp,
+      clickDate: newNow,
+    });
   };
 
   deleteLongPress = (screenList, deleteList) => {
@@ -181,54 +194,6 @@ class Calendar extends PureComponent {
     );
   };
 
-  // timeToString = (time) => {
-  //   const date = moment(time).format();
-  //   return date.split("T")[0];
-  // };
-
-  // loadItems = (items, markingItems, scheduleItems, markedDates, day) => {
-  loadItems = (day) => {
-    console.log("loadItems");
-    // for (let i = 0; i < 85; i++) {
-    //   const time = day.timestamp + i * 24 * 60 * 60 * 1000;
-    //   const strTime = this.timeToString(time);
-    //   const scheduleTempItems = scheduleItems.filter(
-    //     (scheduleItem) => scheduleItem.when === strTime
-    //   );
-    //   if (!items[strTime]) {
-    //     items[strTime] = [];
-    //     markingItems[strTime] = [];
-    //     markedDates[strTime] = [];
-    //     for (let j = 0; j < scheduleTempItems.length; j++) {
-    //       items[strTime].push({
-    //         name: scheduleTempItems[j].name,
-    //         color: scheduleTempItems[j].color,
-    //       });
-    //       markingItems[strTime].push({ color: scheduleTempItems[j].color });
-    //     }
-    //     const markingItemsColors = markingItems[strTime].map((markingItem) => {
-    //       return { color: markingItem.color };
-    //     });
-    //     if (markingItemsColors.length > 0) {
-    //       markedDates[strTime].push({ dots: markingItemsColors });
-    //     }
-    //   }
-    // }
-    // const newItems = {};
-    // const markedNewItems = {};
-    // Object.keys(items).forEach((key) => {
-    //   newItems[key] = items[key];
-    // });
-    // Object.keys(markedDates).forEach((key) => {
-    //   if (markedDates[key].length > 0) {
-    //     markedNewItems[key] = markedDates[key][0];
-    //   }
-    // });
-    // if (Object.keys(markedNewItems).length > 0) {
-    //   this.setState({ items: newItems, markedDates: markedNewItems });
-    // }
-  };
-
   renderItem = (
     showListVisible,
     screenLists,
@@ -236,10 +201,13 @@ class Calendar extends PureComponent {
     deleteList,
     item
   ) => {
+    console.log("screenLists: ", screenLists);
+    console.log("item: ", item);
     const targetScreenList = screenLists.filter(
       (screenList) => screenList.name === item.name
     )[0];
     if (targetScreenList !== undefined) {
+      console.log("targetScreenList: ", targetScreenList);
       const originDate = moment(new Date()).format();
       const splitDate = originDate.split("-");
       const startDate = moment(
@@ -291,6 +259,7 @@ class Calendar extends PureComponent {
       screenList,
       remainingDay,
       clickDate,
+      testItems,
     } = this.state;
     const {
       mode,
@@ -308,7 +277,7 @@ class Calendar extends PureComponent {
       reviseScreenList,
       nowOnChange,
       now,
-      changeNow,
+      setNow,
       selectDate,
     } = this.props;
     const lightWhiteTheme =
@@ -355,6 +324,7 @@ class Calendar extends PureComponent {
             reviseList={reviseList}
             reviseScreenList={reviseScreenList}
             nowOnChange={nowOnChange}
+            // now={now}
             now={clickDate || now}
             selectDate={selectDate}
             mode={mode}
@@ -396,22 +366,15 @@ class Calendar extends PureComponent {
             current={moment().format()}
             minDate={moment().format()}
             items={items}
-            // loadItemsForMonth={this.loadItems.bind(
-            //   this,
-            //   items,
-            //   markingItems,
-            //   scheduleItems,
-            //   markedDates
-            // )}
-            loadItemsForMonth={this.loadItems}
             renderItem={this.renderItem.bind(
               this,
               showListVisible,
-              screenLists,
+              // screenLists,
+              testItems,
               toggleReviseList,
               deleteList
             )}
-            onDayPress={this.dayPress.bind(this, changeNow)}
+            onDayPress={this.dayPress.bind(this, setNow)}
             markingType={"multi-dot"}
             markedDates={markedDates}
             pastScrollRange={1}
@@ -438,7 +401,11 @@ class Calendar extends PureComponent {
                 shadowColor: lightblackTheme,
               },
             ]}
-            onPress={toggleAddTodoModal}
+            onPress={toggleAddTodoModal.bind(
+              this,
+              clickDate || now,
+              "calendar"
+            )}
           >
             <AntDesign name="plus" color={lightWhiteTheme} size={vw(7)} />
           </TouchableOpacity>

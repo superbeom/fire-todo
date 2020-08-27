@@ -9,7 +9,6 @@ import {
   Platform,
   Image,
   StatusBar,
-  BackHandler,
 } from "react-native";
 import AsyncStorage from "@react-native-community/async-storage";
 import { AntDesign } from "@expo/vector-icons";
@@ -43,14 +42,6 @@ export default React.memo(({ navigation, route }) => {
   const [getTime, setGetTime] = useState(null);
   const [mode, setMode] = useState(null);
   const [showCalendar, setShowCalendar] = useState(false);
-
-  // BackHandler.addEventListener("hardwareBackPress", () => {
-  //   BackHandler.exitApp();
-  // });
-
-  const changeNow = (newNow) => {
-    setNow(newNow);
-  };
 
   const toggleCalendarModal = () => {
     setShowCalendar(!showCalendar);
@@ -123,10 +114,15 @@ export default React.memo(({ navigation, route }) => {
     }
   };
 
-  const toggleAddTodoModal = () => {
+  const toggleAddTodoModal = (calendarTime, message) => {
+    if (message === "calendar") {
+      const calendarDate = moment(calendarTime).format();
+      setYearMonthDate(calendarDate);
+    } else {
+      setNow(newDate);
+      setYearMonthDate(newDate, "initialize");
+    }
     setAddTodoVisible(!addTodoVisible);
-    setNow(newDate);
-    setYearMonthDate(newDate, "initialize");
   };
 
   const closeReviseModal = () => {
@@ -450,7 +446,7 @@ export default React.memo(({ navigation, route }) => {
             reviseScreenList={reviseScreenList}
             nowOnChange={nowOnChange}
             now={now}
-            changeNow={changeNow}
+            setNow={setNow}
             selectDate={selectDate}
           />
         </Modal>
