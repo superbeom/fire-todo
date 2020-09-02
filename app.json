@@ -16,23 +16,23 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "bundleIdentifier": "com.heungdo.todosecretary",
-      "buildNumber": "1.0.0",
+      "buildNumber": "1.0.1",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSAllowsArbitraryLoads": true,
         "NSAllowsArbitraryLoadsForMedia": true,
         "NSAllowsArbitraryLoadsInWebContent": true,
         "config": {
-          "googleMobileAdsAppId": "ca-app-pub-4979785113165927~3994657199"
+          "googleMobileAdsAppId": "ca-app-pub-8452350078553076~8258528777"
         }
       }
     },
     "android": {
       "package": "com.heungdo.todosecretary",
-      "versionCode": 2,
+      "versionCode": 1,
       "permissions": [],
       "config": {
-        "googleMobileAdsAppId": "ca-app-pub-4979785113165927~3994657199"
+        "googleMobileAdsAppId": "ca-app-pub-8452350078553076~4706103050"
       }
     },
     "web": {

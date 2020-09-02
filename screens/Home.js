@@ -481,12 +481,22 @@ export default React.memo(() => {
         </View>
       </View>
       <View style={styles.admob}>
-        <AdMobBanner
-          bannerSize="banner"
-          adUnitID="ca-app-pub-4979785113165927/8289125429" // This is my ID
-          servePersonalizedAds={true}
-          onDidFailToReceiveAdWithError={this.bannerError}
-        />
+        {Platform.OS === "ios" && (
+          <AdMobBanner
+            bannerSize="banner"
+            adUnitID="ca-app-pub-8452350078553076/5057650368"
+            servePersonalizedAds={true}
+            onDidFailToReceiveAdWithError={this.bannerError}
+          />
+        )}
+        {Platform.OS === "android" && (
+          <AdMobBanner
+            bannerSize="banner"
+            adUnitID="ca-app-pub-8452350078553076/7140694702"
+            servePersonalizedAds={true}
+            onDidFailToReceiveAdWithError={this.bannerError}
+          />
+        )}
       </View>
     </View>
   );
