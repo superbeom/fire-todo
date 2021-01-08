@@ -10,6 +10,7 @@ import {
   Image,
   StatusBar,
   BackHandler,
+  Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-community/async-storage";
 import { AntDesign } from "@expo/vector-icons";
@@ -22,6 +23,8 @@ import { randomKeyOne } from "../key";
 import moment from "moment";
 import { AdMobBanner } from "expo-ads-admob";
 import Calendar from "./Calendar";
+
+import admob from "../config/admob";
 
 let COUNT = 0;
 let CHECK_INDEX = 0;
@@ -43,6 +46,18 @@ export default React.memo(() => {
   const [getTime, setGetTime] = useState(null);
   const [mode, setMode] = useState(null);
   const [showCalendar, setShowCalendar] = useState(false);
+
+  const backAction = () => {
+    Alert.alert("Hold on!", "Are you sure you want to exit?", [
+      {
+        text: "Cancel",
+        onPress: () => null,
+        style: "cancel",
+      },
+      { text: "YES", onPress: () => BackHandler.exitApp() },
+    ]);
+    return true;
+  };
 
   const toggleCalendarModal = () => {
     setShowCalendar(!showCalendar);
@@ -271,17 +286,10 @@ export default React.memo(() => {
   useEffect(() => {
     preLoad();
 
-    const backAction = () => {
-      BackHandler.exitApp();
-      return true;
-    };
+    BackHandler.addEventListener("hardwareBackPress", backAction);
 
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      backAction
-    );
-
-    return () => backHandler.remove();
+    return () =>
+      BackHandler.removeEventListener("hardwareBackPress", backAction);
   }, []);
 
   return loading ? (
@@ -481,22 +489,16 @@ export default React.memo(() => {
         </View>
       </View>
       <View style={styles.admob}>
-        {Platform.OS === "ios" && (
-          <AdMobBanner
-            bannerSize="banner"
-            adUnitID="ca-app-pub-8452350078553076/5057650368"
-            servePersonalizedAds={true}
-            onDidFailToReceiveAdWithError={this.bannerError}
-          />
-        )}
-        {Platform.OS === "android" && (
-          <AdMobBanner
-            bannerSize="banner"
-            adUnitID="ca-app-pub-8452350078553076/7140694702"
-            servePersonalizedAds={true}
-            onDidFailToReceiveAdWithError={this.bannerError}
-          />
-        )}
+        <AdMobBanner
+          bannerSize="banner"
+          adUnitID={
+            Platform.OS === "ios"
+              ? admob.bannerIosAdUnitId
+              : admob.bannerAndroidAdUnitId
+          }
+          servePersonalizedAds={true}
+          onDidFailToReceiveAdWithError={this.bannerError}
+        />
       </View>
     </View>
   );

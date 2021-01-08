@@ -16,7 +16,7 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "bundleIdentifier": "com.heungdo.todosecretary",
-      "buildNumber": "1.0.0",
+      "buildNumber": "1.0.1",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSAllowsArbitraryLoads": true,
@@ -29,7 +29,7 @@
     },
     "android": {
       "package": "com.heungdo.todosecretary",
-      "versionCode": 3,
+      "versionCode": 4,
       "permissions": [],
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-8452350078553076~4706103050"

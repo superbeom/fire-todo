@@ -14,3 +14,9 @@ web-build/
 
 # for build
 *.plist
+
+# Dependency directories
+node_modules/
+
+# AdMob
+config/*
