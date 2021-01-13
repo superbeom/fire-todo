@@ -8,7 +8,7 @@
     "eject": "expo eject"
   },
   "dependencies": {
-    "@expo/vector-icons": "^10.2.0",
+    "@expo/vector-icons": "^10.0.0",
     "@react-native-community/async-storage": "^1.11.0",
     "@react-native-community/datetimepicker": "2.4.0",
     "@react-native-community/hooks": "^2.6.0",
