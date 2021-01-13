@@ -2,7 +2,7 @@
   "expo": {
     "name": "Todo Secretary",
     "slug": "todo-secretary",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -16,7 +16,7 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "bundleIdentifier": "com.heungdo.todosecretary",
-      "buildNumber": "1.0.1",
+      "buildNumber": "1.0.2",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSAllowsArbitraryLoads": true,
@@ -29,8 +29,8 @@
     },
     "android": {
       "package": "com.heungdo.todosecretary",
-      "versionCode": 4,
-      "permissions": [],
+      "versionCode": 5,
+      "permissions": ["ACCESS_BACKGROUND_LOCATION"],
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-8452350078553076~4706103050"
       }

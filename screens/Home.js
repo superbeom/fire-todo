@@ -488,6 +488,7 @@ export default React.memo(() => {
           />
         </View>
       </View>
+
       <View style={styles.admob}>
         <AdMobBanner
           bannerSize="banner"

@@ -195,9 +195,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   todo: {
-    color: colors.blackColor,
+    width: "90%",
     fontWeight: "700",
     fontSize: 18,
+    color: colors.blackColor,
   },
   leftAction: {
     flex: 1,
