@@ -16,15 +16,15 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "bundleIdentifier": "com.heungdo.todosecretary",
-      "buildNumber": "1.0.2",
+      "buildNumber": "1.0.3",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSAllowsArbitraryLoads": true,
         "NSAllowsArbitraryLoadsForMedia": true,
-        "NSAllowsArbitraryLoadsInWebContent": true,
-        "config": {
-          "googleMobileAdsAppId": "ca-app-pub-8452350078553076~8258528777"
-        }
+        "NSAllowsArbitraryLoadsInWebContent": true
+      },
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-8452350078553076~8258528777"
       }
     },
     "android": {
